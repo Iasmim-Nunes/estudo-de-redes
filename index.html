@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rede em Quatro Pares</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700&family=JetBrains+Mono:wght@500&family=Source+Sans+3:wght@400;600&display=swap">
+<style>
+  :root{
+    --paper:#EFF2F6; --surface:#FFFFFF; --ink:#151E31; --muted:#5B6980; --line:#D6DDE8;
+    --p1:#C9631F; --p2:#2C7A4B; --p3:#2B5FAE; --p4:#7A5237;
+    --ok:#2C7A4B; --no:#B3261E; --okbg:#E8F3EC; --nobg:#FBEAE8; --onaccent:#FFFFFF;
+    --display:"Bricolage Grotesque",Georgia,serif;
+    --body:"Source Sans 3",system-ui,sans-serif;
+    --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#0E141F; --surface:#18212F; --ink:#E6ECF5; --muted:#98A6BC; --line:#2B3648;
+      --p1:#EF9450; --p2:#63C08A; --p3:#77A8EA; --p4:#C1905F;
+      --ok:#63C08A; --no:#F0928A; --okbg:#16301F; --nobg:#33191A; --onaccent:#12161F;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#0E141F; --surface:#18212F; --ink:#E6ECF5; --muted:#98A6BC; --line:#2B3648;
+    --p1:#EF9450; --p2:#63C08A; --p3:#77A8EA; --p4:#C1905F;
+    --ok:#63C08A; --no:#F0928A; --okbg:#16301F; --nobg:#33191A; --onaccent:#12161F;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6}
+  .wrap{max-width:720px;margin:0 auto;padding-inline:16px;padding-block:32px 56px}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+  h1{font-family:var(--display);font-size:clamp(28px,6vw,40px);line-height:1.1;margin:0;text-wrap:balance}
+  .sub{color:var(--muted);margin:8px 0 28px;max-width:54ch}
+  .pairs{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:24px}
+  .pair{display:flex;flex-direction:column;gap:6px;min-width:0}
+  .pair .bar{height:5px;border-radius:99px;background:var(--line)}
+  .pair.on .bar,.pair.done .bar{background:var(--c)}
+  .pair.striped.on .bar,.pair.striped.done .bar{background:repeating-linear-gradient(90deg,var(--c) 0 7px,var(--surface) 7px 12px)}
+  .pair .nm{font-size:12px;color:var(--muted);line-height:1.3}
+  .pair.on .nm{color:var(--ink);font-weight:600}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:24px;box-shadow:0 1px 2px rgba(20,32,58,.06)}
+  .tag{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--c,var(--muted));display:flex;justify-content:space-between;gap:12px;margin-bottom:12px}
+  .q{font-family:var(--display);font-size:20px;line-height:1.3;margin:0 0 18px;text-wrap:balance}
+  .opts{display:flex;flex-direction:column;gap:8px}
+  button{font:inherit;color:inherit}
+  .opt{text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 14px;cursor:pointer;transition:border-color .15s,background .15s}
+  .opt:hover:not(:disabled){border-color:var(--c)}
+  .opt:disabled{cursor:default}
+  .opt.right{border-color:var(--ok);background:var(--okbg)}
+  .opt.wrong{border-color:var(--no);background:var(--nobg)}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .slots{display:flex;flex-direction:column;gap:5px;margin-bottom:16px}
+  .slot{display:flex;align-items:center;gap:10px;border:1px dashed var(--line);border-radius:7px;padding:7px 12px;min-height:40px}
+  .slot .n{font-family:var(--mono);font-size:12px;color:var(--muted);width:18px;flex:none}
+  .slot.filled{border-style:solid;border-color:var(--c);background:var(--okbg)}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:8px 14px;cursor:pointer}
+  .chip:hover:not(:disabled){border-color:var(--c)}
+  .chip:disabled{opacity:.35;cursor:default}
+  .chip.bad{border-color:var(--no);background:var(--nobg);animation:nudge .3s}
+  @keyframes nudge{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+  @media (prefers-reduced-motion: reduce){.chip.bad{animation:none}}
+  .fb{margin-top:18px;border-top:1px solid var(--line);padding-top:16px}
+  .verdict{font-weight:600;margin:0 0 6px}
+  .verdict.y{color:var(--ok)} .verdict.n{color:var(--no)}
+  .why{margin:0;color:var(--muted)}
+  .why code,.q code,.opt code,.slot code{font-family:var(--mono);font-size:.9em;background:var(--paper);padding:1px 5px;border-radius:4px}
+  .next{margin-top:18px;background:var(--p1);border:none;border-radius:8px;padding:11px 22px;color:var(--onaccent);font-weight:600;cursor:pointer}
+  .next:hover{filter:brightness(1.08)}
+  .ghost{margin-top:18px;margin-left:8px;background:none;border:1px solid var(--line);border-radius:8px;padding:11px 18px;cursor:pointer;color:var(--muted)}
+  .ghost:hover{border-color:var(--muted);color:var(--ink)}
+  .topbar{min-height:30px;margin:-12px 0 12px}
+  .back{background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;padding:4px 0}
+  .back:hover{color:var(--ink)}
+  .score{font-family:var(--mono);font-size:12px;color:var(--muted)}
+  .menu h2{font-family:var(--display);font-size:22px;margin:0 0 2px}
+  .menu .lead{color:var(--muted);margin:0 0 18px}
+  .picks{display:flex;flex-direction:column;gap:8px}
+  .pick{display:flex;align-items:center;gap:12px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 14px;cursor:pointer}
+  .pick:hover{border-color:var(--c)}
+  .pick .dot{width:10px;height:10px;border-radius:99px;flex:none;background:var(--c)}
+  .pick .lbl{flex:1}
+  .pick .val{font-family:var(--mono);font-size:12px;color:var(--muted)}
+  .final h2{font-family:var(--display);font-size:26px;margin:0 0 4px}
+  .big{font-family:var(--display);font-size:56px;line-height:1;margin:14px 0 4px}
+  .rows{list-style:none;padding:0;margin:20px 0 0;display:flex;flex-direction:column;gap:10px}
+  .rows li{display:flex;align-items:center;gap:10px;justify-content:space-between;border-top:1px solid var(--line);padding-top:10px}
+  .rows .dot{width:10px;height:10px;border-radius:99px;flex:none}
+  .rows .lbl{flex:1}
+  .rows .val{font-family:var(--mono);font-size:13px}
+  button:focus-visible{outline:2px solid var(--p3);outline-offset:2px}
+</style>
+
+<style>:root{color-scheme:light dark}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">Estudo de redes</p>
+  <h1>Rede em Quatro Pares</h1>
+  <p class="sub">Cinco rodadas cobrindo os seis exercícios: modelo OSI, montagem da LAN com Wi-Fi, ligação entre duas redes, as tabelas MAC e ARP, e a topologia completa.</p>
+  <div class="pairs" id="pairs"></div>
+  <div class="topbar" id="topbar"></div>
+  <div id="stage"></div>
+</div>
+
+<script>
+const ROUNDS = [
+  { name:"Modelo OSI", color:"var(--p1)", qs:[
+    { type:"order",
+      q:"Coloque as sete camadas do modelo OSI na ordem, da camada 7 para a camada 1.",
+      labels:["7","6","5","4","3","2","1"],
+      correct:["Aplicação","Apresentação","Sessão","Transporte","Rede","Enlace","Física"],
+      why:"De cima para baixo: aplicação, apresentação, sessão, transporte, rede, enlace e física. Os dados descem essa pilha na origem e sobem no destino." },
+    { type:"mc", q:"HTTP, DNS e SMTP ficam em qual camada?",
+      opts:["Aplicação","Apresentação","Sessão","Transporte"], a:0,
+      why:"A camada 7 é o protocolo do serviço que o programa usa." },
+    { type:"mc", q:"Qual camada cuida do formato, da codificação e da criptografia dos dados?",
+      opts:["Sessão","Apresentação","Aplicação","Enlace"], a:1,
+      why:"É a camada 6. TLS, JSON, JPEG e UTF-8 são exemplos do que vive ali." },
+    { type:"mc", q:"Qual camada abre, mantém e encerra o diálogo entre as duas pontas?",
+      opts:["Transporte","Aplicação","Sessão","Rede"], a:2,
+      why:"A camada 5 controla a sessão. Não confunda com transporte, que cuida da entrega em si." },
+    { type:"mc", q:"TCP e UDP pertencem a qual camada?",
+      opts:["Rede","Sessão","Transporte","Apresentação"], a:2,
+      why:"A camada 4 faz a entrega fim a fim entre processos, usando portas. O TCP é confiável e o UDP não garante entrega." },
+    { type:"mc", q:"Em qual camada trabalha o roteador?",
+      opts:["Camada 3, rede","Camada 2, enlace","Camada 4, transporte","Camada 1, física"], a:0,
+      why:"O roteador decide o caminho olhando o endereço IP, que é camada 3." },
+    { type:"mc", q:"E o switch, em qual camada trabalha?",
+      opts:["Camada 1, física","Camada 2, enlace","Camada 3, rede","Camada 7, aplicação"], a:1,
+      why:"O switch encaminha quadros pelo endereço MAC, sem olhar o IP. Isso é camada 2." },
+    { type:"mc", q:"Qual camada transmite os bits como sinal elétrico, óptico ou de rádio?",
+      opts:["Enlace","Rede","Física","Transporte"], a:2,
+      why:"A camada 1 é o meio: cabo UTP, fibra, conector RJ-45 e o rádio do Wi-Fi." }
+  ]},
+  { name:"Montar a LAN", color:"var(--p2)", qs:[
+    { type:"mc", q:"A lista de hardware tem roteador, switch e access point. O que ainda falta?",
+      opts:["Modem ou ONT, cabos UTP e placa de rede em cada PC","Só um nobreak","Um segundo switch","Nada, a lista está completa"], a:0,
+      why:"Sem modem não há internet, sem cabo não há ligação física e sem placa de rede o PC não entra na rede." },
+    { type:"mc", q:"Você tem 5 PCs para ligar por cabo, mas o roteador só tem 4 portas LAN. O que resolve?",
+      opts:["Um segundo roteador","Um switch ligado a uma porta LAN do roteador","Um access point","Um modem"], a:1,
+      why:"O switch expande as portas da mesma rede. Um segundo roteador criaria outra rede, que não é o que se quer aqui." },
+    { type:"mc", q:"Onde o access point deve ser ligado?",
+      opts:["Na porta WAN do roteador","Em uma porta LAN do switch","Direto no modem","Em lugar nenhum, ele é só sem fio"], a:1,
+      why:"O access point é uma ponte de camada 2 e precisa entrar na LAN. Ligado na WAN ele ficaria fora da rede." },
+    { type:"mc", q:"Os notebooks que entram pelo Wi-Fi ficam em qual rede?",
+      opts:["Em uma rede separada dos cabeados","Na mesma rede dos cabeados","Em outra rede, só se houver DHCP","Depende do nome do SSID"], a:1,
+      why:"Como o access point é ponte de camada 2, sem fio e cabo dividem a mesma faixa de IP, a mesma máscara e o mesmo gateway." },
+    { type:"mc", q:"Para que serve a máscara de sub-rede?",
+      opts:["Esconder o IP do host na internet","Separar a parte de rede da parte de host","Definir a velocidade da porta","Criptografar o tráfego"], a:1,
+      why:"É a máscara que diz ao host se o destino está na rede local ou se o pacote precisa ir para o gateway." },
+    { type:"mc", q:"Para que serve o gateway padrão?",
+      opts:["Distribuir IPs na rede","Receber todo pacote endereçado a outra rede","Traduzir nome em IP","Guardar a tabela MAC"], a:1,
+      why:"É o IP do roteador na LAN. Sem ele o host só fala com a própria rede." },
+    { type:"mc", q:"Qual elemento entrega IP, máscara, gateway e DNS automaticamente aos hosts?",
+      opts:["NAT","DNS","DHCP","ARP"], a:2,
+      why:"O DHCP distribui a configuração. Sem ele, cada host precisa de IP fixo digitado à mão." },
+    { type:"mc", q:"Para que serve o DNS?",
+      opts:["Traduzir nome em endereço IP","Traduzir IP privado em público","Traduzir IP em MAC","Distribuir endereços na rede"], a:0,
+      why:"Sem DNS a rede funciona por IP, mas nada resolve por nome. Quem traduz IP em MAC é o ARP." },
+    { type:"mc", q:"Para que serve o NAT?",
+      opts:["Separar a rede sem fio da cabeada","Trocar o IP privado pelo público na saída para a internet","Criar sub-redes","Aprender endereços MAC"], a:1,
+      why:"O NAT deixa todos os hosts da LAN usarem um único endereço público." },
+    { type:"mc", q:"O que é essencial configurar na rede sem fio?",
+      opts:["Só o nome da rede","SSID e segurança WPA2 ou WPA3","Apenas o canal do rádio","O endereço MAC do access point"], a:1,
+      why:"O SSID identifica a rede e o WPA2 ou WPA3 autentica quem entra e cifra o rádio." }
+  ]},
+  { name:"R1 e R2", color:"var(--p3)", qs:[
+    { type:"mc", q:"R1 é <code>192.168.1.0/24</code> e R2 é <code>192.168.2.0/24</code>. O que liga as duas?",
+      opts:["Um switch comum","Um access point","Um roteador","Um hub"], a:2,
+      why:"Redes com endereçamento diferente exigem uma decisão de camada 3. Switch comum só encaminha dentro do mesmo domínio de broadcast." },
+    { type:"mc", q:"O que precisa ser configurado nesse equipamento?",
+      opts:["Uma interface com IP em cada rede e o roteamento habilitado","Um SSID para cada rede","NAT entre R1 e R2","Um único IP, que serve as duas"], a:0,
+      why:"Cada interface recebe um IP dentro da sua sub-rede, e esses IPs viram os gateways dos hosts. NAT é para a saída à internet, não entre redes internas." },
+    { type:"mc", q:"O PC1 usa <code>192.168.1.10</code> com máscara <code>255.255.255.0</code>. Qual gateway ele precisa?",
+      opts:["<code>192.168.1.1</code>, a interface do roteador em R1","<code>192.168.2.1</code>, a interface do roteador em R2","<code>192.168.1.255</code>","Nenhum, o switch resolve"], a:0,
+      why:"O gateway tem que estar na mesma rede do host. É o IP do roteador dentro de R1." },
+    { type:"mc", q:"Todos os hosts de R1 precisam ter o quê em comum?",
+      opts:["A mesma sub-rede e a mesma máscara, com IPs únicos","O mesmo endereço MAC","A mesma máscara, mas sub-redes diferentes","O mesmo IP do gateway"], a:0,
+      why:"Aplicando a máscara ao IP de cada host, o endereço de rede tem que dar igual para todos. IP repetido derruba os dois hosts." },
+    { type:"mc", q:"Qual endereço NÃO pode ser dado a um host em <code>192.168.1.0/24</code>?",
+      opts:["<code>192.168.1.1</code>","<code>192.168.1.99</code>","<code>192.168.1.254</code>","<code>192.168.1.255</code>"], a:3,
+      why:"O <code>192.168.1.255</code> é o broadcast e o <code>192.168.1.0</code> é o endereço de rede. Os hosts vão de .1 a .254." },
+    { type:"mc", q:"Dá para usar <code>192.168.1.0/24</code> em R1 e <code>192.168.1.128/25</code> em R2?",
+      opts:["Sim, as máscaras são diferentes","Não, as faixas se sobrepõem","Sim, desde que o roteador tenha NAT","Só se as duas usarem DHCP"], a:1,
+      why:"A faixa de R2 está dentro da faixa de R1. Sub-redes sobrepostas quebram o roteamento, porque o host conclui que o destino é local." },
+    { type:"mc", q:"O ping do PC1 para <code>192.168.2.10</code> não responde. Qual o primeiro teste?",
+      opts:["Trocar o cabo do roteador","Pingar o próprio gateway, <code>192.168.1.1</code>","Reinstalar o sistema","Desligar o switch"], a:1,
+      why:"Testa-se do mais perto para o mais longe: gateway local, depois a interface do roteador em R2, depois o host de destino." },
+    { type:"mc", q:"Qual comando mostra em qual salto o caminho morre?",
+      opts:["<code>ipconfig</code>","<code>arp -a</code>","<code>tracert</code>","<code>ping</code>"], a:2,
+      why:"O tracert lista os saltos até o destino. O <code>arp -a</code> mostra o cache ARP e o <code>ipconfig</code> mostra a configuração local." },
+    { type:"mc", q:"O ping falha, mas a aplicação na porta 8080 responde. O que isso indica?",
+      opts:["A rede está sem conectividade","O ICMP está bloqueado por firewall","O gateway está errado","O cabo está partido"], a:1,
+      why:"O ping usa ICMP, que muitos firewalls bloqueiam. Por isso vale testar a porta da aplicação antes de concluir que a rede caiu." }
+  ]},
+  { name:"MAC e ARP", color:"var(--p4)", qs:[
+    { type:"two", q:"Associa cada endereço MAC à porta em que ele foi visto.", opts:["Tabela MAC","Tabela ARP"], a:0,
+      why:"É o que o switch usa para mandar o quadro só pela porta certa." },
+    { type:"two", q:"Associa um endereço IP ao endereço MAC correspondente.", opts:["Tabela MAC","Tabela ARP"], a:1,
+      why:"O ARP é a ponte entre a camada 3 e a camada 2." },
+    { type:"two", q:"Fica na memória do switch.", opts:["Tabela MAC","Tabela ARP"], a:0,
+      why:"Uma por switch. Consulta-se com <code>show mac address-table</code>." },
+    { type:"two", q:"Fica na memória de cada host e também do roteador.", opts:["Tabela MAC","Tabela ARP"], a:1,
+      why:"Cada dispositivo tem a sua. No Windows, <code>arp -a</code>." },
+    { type:"two", q:"Sem ela, o quadro teria que sair por todas as portas.", opts:["Tabela MAC","Tabela ARP"], a:0,
+      why:"Sem tabela MAC o switch viraria um hub, inundando a rede." },
+    { type:"two", q:"É preenchida com uma pergunta em broadcast: quem tem este IP?", opts:["Tabela MAC","Tabela ARP"], a:1,
+      why:"É o ARP Request. O dono do IP responde em unicast e o par entra no cache." },
+    { type:"mc", q:"O PC1, em R1, vai falar com o PC2, em R2. Qual MAC vai no quadro que sai do PC1?",
+      opts:["O MAC do PC2","O MAC do roteador","O broadcast <code>FF:FF:FF:FF:FF:FF</code>","Nenhum, só o IP"], a:1,
+      why:"O IP de destino continua sendo o do PC2, mas o MAC é o do próximo salto. O ARP não atravessa o roteador." }
+  ]},
+  { name:"Montar a rede", color:"var(--p1)", striped:true, qs:[
+    { type:"order",
+      q:"Um quadro sai do PC1, em R1, para o PC2, em R2. Coloque o caminho na ordem.",
+      labels:["1","2","3","4","5"],
+      correct:["PC1","Switch SW1","Roteador","Switch SW2","PC2"],
+      why:"O IP de origem e destino não muda no caminho. O que é reescrito a cada salto é o par de endereços MAC." },
+    { type:"mc", q:"Na topologia do exercício, quantos endereços de rede diferentes existem?",
+      opts:["Um, porque tudo está ligado","Dois, um para cada LAN","Quatro, um por switch e um por access point","Cinco, um por equipamento"], a:1,
+      why:"R1 usa <code>192.168.1.0/24</code> e R2 usa <code>192.168.2.0/24</code>. Switches e access points não criam rede nova." },
+    { type:"mc", q:"Qual é a configuração essencial do access point AP1?",
+      opts:["IP fixo e gateway próprio","SSID com WPA3, ligado ao switch, sem IP de rede","Uma rota para R2","Uma tabela ARP própria"], a:1,
+      why:"O AP é ponte de camada 2. Ele leva os clientes sem fio para dentro da mesma LAN, sem rotear nada." },
+    { type:"mc", q:"O Note1 entrou pelo Wi-Fi em R1 e pegou IP por DHCP. Qual gateway ele recebe?",
+      opts:["<code>192.168.1.1</code>, o mesmo do PC1","<code>192.168.2.1</code>","O IP do access point","Nenhum, porque é sem fio"], a:0,
+      why:"Cabeado e sem fio estão na mesma rede, então compartilham o gateway." },
+    { type:"mc", q:"O que vai na coluna de porta da tabela MAC do SW1?",
+      opts:["O IP de cada host","A porta do switch onde cada MAC foi visto","A porta TCP usada pela aplicação","O canal do Wi-Fi"], a:1,
+      why:"Porta física, como Fa0/1. Porta TCP é outra coisa, e fica na camada 4." },
+    { type:"mc", q:"Entre estes itens, qual NÃO é configuração e sim característica de fábrica?",
+      opts:["O endereço IP","A máscara de sub-rede","O endereço MAC","O gateway padrão"], a:2,
+      why:"O MAC vem gravado na placa de rede. Ele aparece no desenho porque as tabelas MAC e ARP são feitas dele, não porque seja configurado." }
+  ]}
+];
+
+let playlist=[], pi=0, qi=0, answered=false, order={pos:0,err:0};
+let scores=ROUNDS.map(function(){ return 0; });
+const pairsEl=document.getElementById("pairs"), stage=document.getElementById("stage"), topEl=document.getElementById("topbar");
+
+function curRound(){ return playlist.length ? playlist[pi] : -1; }
+function totalQs(){ return playlist.reduce(function(s,i){ return s+ROUNDS[i].qs.length; },0); }
+function totalScore(){ return playlist.reduce(function(s,i){ return s+scores[i]; },0); }
+
+function drawPairs(){
+  const cur=curRound();
+  pairsEl.innerHTML = ROUNDS.map(function(r,i){
+    const played = playlist.indexOf(i);
+    const state = i===cur ? "on" : (played>-1 && played<pi ? "done" : "");
+    return '<div class="pair '+state+(r.striped?" striped":"")+'" style="--c:'+r.color+'"><div class="bar"></div><div class="nm">'+r.name+'</div></div>';
+  }).join("");
+  if(playlist.length){
+    topEl.innerHTML='<button class="back" id="back">&larr; Voltar ao início</button>';
+    document.getElementById("back").onclick=function(){ renderMenu(); window.scrollTo({top:0,behavior:"smooth"}); };
+  } else {
+    topEl.innerHTML="";
+  }
+}
+
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); const t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+
+function renderMenu(){
+  playlist=[]; pi=0; qi=0;
+  scores=ROUNDS.map(function(){ return 0; });
+  drawPairs();
+  const all=ROUNDS.reduce(function(s,r){ return s+r.qs.length; },0);
+  stage.innerHTML='<div class="card menu"><h2>Escolha por onde começar</h2>'+
+    '<p class="lead">Cada resposta vem com a explicação. Errar não bloqueia nada.</p>'+
+    '<div class="picks">'+
+    '<button class="pick" data-all="1" style="--c:var(--p3)"><span class="dot"></span><span class="lbl">Jogo completo</span><span class="val">'+all+' perguntas</span></button>'+
+    ROUNDS.map(function(r,i){
+      return '<button class="pick" data-i="'+i+'" style="--c:'+r.color+'"><span class="dot"></span><span class="lbl">'+r.name+'</span><span class="val">'+r.qs.length+' perguntas</span></button>';
+    }).join("")+'</div></div>';
+  stage.querySelectorAll(".pick").forEach(function(b){
+    b.onclick=function(){
+      playlist = b.dataset.all ? ROUNDS.map(function(_,i){ return i; }) : [+b.dataset.i];
+      pi=0; qi=0; scores=ROUNDS.map(function(){ return 0; });
+      render();
+    };
+  });
+}
+
+function render(){
+  drawPairs();
+  if(pi>=playlist.length) return renderFinal();
+  const r=ROUNDS[playlist[pi]], q=r.qs[qi];
+  answered=false; order={pos:0,err:0};
+  let inner="";
+  if(q.type==="order"){
+    inner='<div class="slots">'+q.correct.map(function(_,i){
+      return '<div class="slot" id="slot'+i+'" style="--c:'+r.color+'"><span class="n">'+q.labels[i]+'</span><span class="txt"></span></div>';
+    }).join("")+'</div><div class="chips">'+shuffle(q.correct.slice()).map(function(n){
+      return '<button class="chip" style="--c:'+r.color+'" data-n="'+n+'">'+n+'</button>';
+    }).join("")+'</div>';
+  } else {
+    const cls = q.type==="two" ? "opts two" : "opts";
+    inner='<div class="'+cls+'">'+q.opts.map(function(o,i){
+      return '<button class="opt" style="--c:'+r.color+'" data-i="'+i+'">'+o+'</button>';
+    }).join("")+'</div>';
+  }
+  stage.innerHTML='<div class="card" style="--c:'+r.color+'">'+
+    '<div class="tag"><span>'+r.name+' · '+(qi+1)+' de '+r.qs.length+'</span><span class="score">'+totalScore()+' / '+totalQs()+'</span></div>'+
+    '<p class="q">'+q.q+'</p>'+inner+'<div id="fb"></div></div>';
+  if(q.type==="order"){
+    stage.querySelectorAll(".chip").forEach(function(c){ c.onclick=function(){ onChip(c,q); }; });
+  } else {
+    stage.querySelectorAll(".opt").forEach(function(b){ b.onclick=function(){ onOpt(+b.dataset.i,q); }; });
+  }
+}
+
+function onChip(btn,q){
+  if(answered) return;
+  const want=q.correct[order.pos];
+  if(btn.dataset.n===want){
+    const slot=document.getElementById("slot"+order.pos);
+    slot.classList.add("filled"); slot.querySelector(".txt").textContent=want;
+    btn.disabled=true; order.pos++;
+    if(order.pos===q.correct.length) finish(order.err===0,q);
+  } else {
+    order.err++; btn.classList.add("bad");
+    setTimeout(function(){ btn.classList.remove("bad"); },320);
+  }
+}
+
+function onOpt(i,q){
+  if(answered) return;
+  const btns=stage.querySelectorAll(".opt");
+  btns.forEach(function(b,j){ b.disabled=true; if(j===q.a) b.classList.add("right"); });
+  if(i!==q.a) btns[i].classList.add("wrong");
+  finish(i===q.a,q);
+}
+
+function finish(ok,q){
+  answered=true;
+  if(ok) scores[playlist[pi]]++;
+  const r=ROUNDS[playlist[pi]];
+  const last = pi===playlist.length-1 && qi===r.qs.length-1;
+  const msg = ok ? "Certo" : (q.type==="order" ? "Ordem montada, mas com erros no caminho" : "Não é essa");
+  document.getElementById("fb").innerHTML='<div class="fb"><p class="verdict '+(ok?"y":"n")+'">'+msg+'</p>'+
+    '<p class="why">'+q.why+'</p><button class="next" id="next">'+(last?"Ver resultado":"Próxima")+'</button></div>';
+  const nx=document.getElementById("next");
+  nx.onclick=function(){
+    qi++; if(qi>=r.qs.length){ pi++; qi=0; }
+    render(); window.scrollTo({top:0,behavior:"smooth"});
+  };
+  nx.focus();
+}
+
+function renderFinal(){
+  const t=totalScore(), n=totalQs(), pct=Math.round(t/n*100);
+  const verdict = pct>=85 ? "Conteúdo dominado. Dá para encarar a prova."
+    : pct>=60 ? "Boa base. Vale revisar a rodada com menos acerto."
+    : "Releia o material e jogue de novo.";
+  const played=playlist.slice();
+  stage.innerHTML='<div class="card final"><h2>Resultado</h2><p class="why">'+verdict+'</p>'+
+    '<p class="big">'+t+'<span style="font-size:24px;color:var(--muted)"> / '+n+'</span></p><ul class="rows">'+
+    played.map(function(i){
+      const r=ROUNDS[i];
+      return '<li><span class="dot" style="background:'+r.color+'"></span><span class="lbl">'+r.name+'</span><span class="val">'+scores[i]+' / '+r.qs.length+'</span></li>';
+    }).join("")+'</ul><button class="next" id="again">Jogar de novo</button>'+
+    '<button class="ghost" id="menu">Página inicial</button></div>';
+  document.getElementById("again").onclick=function(){
+    pi=0; qi=0;
+    played.forEach(function(i){ scores[i]=0; });
+    render(); window.scrollTo({top:0,behavior:"smooth"});
+  };
+  document.getElementById("menu").onclick=function(){ renderMenu(); window.scrollTo({top:0,behavior:"smooth"}); };
+  drawPairs();
+}
+
+function start(s){
+  if(s && s.playlist && s.playlist.length){
+    playlist=s.playlist; pi=s.pi; qi=s.qi; scores=s.scores;
+    render();
+  } else {
+    renderMenu();
+  }
+}
+if(window.claude && window.claude.hot && window.claude.hot.snapshot){
+  window.claude.hot.snapshot(function(){ return {playlist:playlist,pi:pi,qi:qi,scores:scores}; });
+}
+if(window.claude && window.claude.hot && window.claude.hot.ready){
+  window.claude.hot.ready(start);
+} else {
+  start((window.claude && window.claude.hot && window.claude.hot.data) || {});
+}
+</script>
+</body>
+</html>
