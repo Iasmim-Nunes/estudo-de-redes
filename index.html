@@ -92,6 +92,31 @@
   .rows .lbl{flex:1}
   .rows .val{font-family:var(--mono);font-size:13px}
   button:focus-visible{outline:2px solid var(--p3);outline-offset:2px}
+  .tabs{display:flex;margin-bottom:22px;border-bottom:1px solid var(--line)}
+  .tab{background:none;border:none;border-bottom:2px solid transparent;padding:8px 2px;margin-right:22px;color:var(--muted);cursor:pointer;font-weight:600}
+  .tab.on{color:var(--ink);border-bottom-color:var(--p1)}
+  .theory .card+.card{margin-top:16px}
+  .theory h2{font-family:var(--display);font-size:21px;margin:0 0 10px}
+  .theory h3{font-size:15px;font-weight:600;margin:18px 0 6px}
+  .theory p{margin:0 0 10px}
+  .theory ul,.theory ol{margin:0 0 10px;padding-left:20px}
+  .theory li{margin-bottom:5px}
+  .theory .k{font-weight:600}
+  .theory code{font-family:var(--mono);font-size:.9em;background:var(--paper);padding:1px 5px;border-radius:4px}
+  .scroller{overflow-x:auto}
+  .tbl{width:100%;border-collapse:collapse;margin:6px 0 14px;font-size:14px}
+  .tbl th,.tbl td{text-align:left;border-bottom:1px solid var(--line);padding:7px 14px 7px 0;white-space:nowrap}
+  .tbl th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  .tbl td{font-family:var(--mono);font-size:13px}
+  .topo{display:flex;flex-direction:column;gap:10px;margin:12px 0 18px}
+  .lan{border:1px dashed var(--line);border-radius:10px;padding:14px}
+  .lanhead{font-weight:600;margin:0 0 10px;font-size:14px}
+  .nodes{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+  @media (max-width:540px){.nodes{grid-template-columns:1fr}}
+  .node{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:var(--paper)}
+  .nn{margin:0 0 3px;font-weight:600;font-size:14px}
+  .nc{margin:0;font-family:var(--mono);font-size:12px;color:var(--muted);line-height:1.6}
+  .router{border:1px solid var(--p1);border-radius:8px;padding:10px 12px;font-family:var(--mono);font-size:12px;text-align:center;line-height:1.6}
 </style>
 
 <style>:root{color-scheme:light dark}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
@@ -100,10 +125,135 @@
 <div class="wrap">
   <p class="eyebrow">Estudo de redes</p>
   <h1>Rede em Quatro Pares</h1>
-  <p class="sub">Cinco rodadas cobrindo os seis exercícios: modelo OSI, montagem da LAN com Wi-Fi, ligação entre duas redes, as tabelas MAC e ARP, e a topologia completa.</p>
-  <div class="pairs" id="pairs"></div>
-  <div class="topbar" id="topbar"></div>
-  <div id="stage"></div>
+  <p class="sub">A teoria dos seis exercícios e um quiz de cinco rodadas sobre ela: modelo OSI, montagem da LAN com Wi-Fi, ligação entre duas redes, as tabelas MAC e ARP, e a topologia completa.</p>
+
+  <nav class="tabs">
+    <button class="tab on" data-v="jogo">Jogo</button>
+    <button class="tab" data-v="teoria">Teoria</button>
+  </nav>
+
+  <section id="view-jogo">
+    <div class="pairs" id="pairs"></div>
+    <div class="topbar" id="topbar"></div>
+    <div id="stage"></div>
+  </section>
+
+  <section id="view-teoria" class="theory" hidden>
+
+    <article class="card">
+      <h2>1. Camadas do modelo OSI</h2>
+      <p>São sete camadas. Os dados descem da 7 para a 1 na origem, ganhando um cabeçalho em cada uma, e sobem da 1 para a 7 no destino.</p>
+      <ul>
+        <li><span class="k">Camada 7, aplicação:</span> protocolo do serviço que o programa usa, como HTTP, DNS e SMTP.</li>
+        <li><span class="k">Camada 6, apresentação:</span> formato, codificação e criptografia dos dados. TLS, JSON, UTF-8.</li>
+        <li><span class="k">Camada 5, sessão:</span> abre, mantém e encerra o diálogo entre as duas pontas.</li>
+        <li><span class="k">Camada 4, transporte:</span> entrega fim a fim entre processos, usando portas. TCP e UDP.</li>
+        <li><span class="k">Camada 3, rede:</span> endereçamento IP e roteamento entre redes diferentes. É onde age o roteador.</li>
+        <li><span class="k">Camada 2, enlace:</span> entrega dentro do segmento local, por endereço MAC. É onde age o switch.</li>
+        <li><span class="k">Camada 1, física:</span> transmite os bits pelo cabo, pela fibra ou pelo rádio.</li>
+      </ul>
+      <p>Na prática o que roda é o modelo TCP/IP, que junta as camadas 5, 6 e 7 em uma só camada de aplicação, e as camadas 1 e 2 em uma camada de acesso à rede.</p>
+    </article>
+
+    <article class="card">
+      <h2>2. Rede local com 5 PCs e acesso sem fio</h2>
+      <h3>Hardware necessário</h3>
+      <ul>
+        <li>Roteador, que faz gateway, DHCP e NAT</li>
+        <li>Switch, para ligar os PCs cabeados</li>
+        <li>Access point, para o Wi-Fi</li>
+        <li>Placa de rede em cada PC</li>
+        <li>Cabos UTP com conector RJ-45</li>
+        <li>Modem ou ONT, se houver internet</li>
+      </ul>
+      <h3>Como conectar</h3>
+      <ol>
+        <li>Modem na porta WAN do roteador.</li>
+        <li>Porta LAN do roteador no switch.</li>
+        <li>Cada PC em uma porta do switch.</li>
+        <li>Access point em uma porta do switch, nunca na WAN.</li>
+        <li>Notebooks e celulares conectam no SSID.</li>
+      </ol>
+      <p>Os dispositivos sem fio ficam na mesma rede lógica dos cabeados, porque o access point é uma ponte de camada 2.</p>
+      <h3>Configuração lógica</h3>
+      <ul>
+        <li><span class="k">IP:</span> identifica cada host e não pode repetir.</li>
+        <li><span class="k">Máscara:</span> separa a parte de rede da parte de host e define se o destino é local.</li>
+        <li><span class="k">Gateway padrão:</span> por onde sai o tráfego destinado a outras redes.</li>
+        <li><span class="k">DNS:</span> traduz nome em IP.</li>
+        <li><span class="k">DHCP:</span> entrega IP, máscara, gateway e DNS automaticamente.</li>
+        <li><span class="k">SSID com WPA2 ou WPA3:</span> nome e segurança da rede sem fio.</li>
+        <li><span class="k">NAT:</span> troca o IP privado pelo público na saída para a internet.</li>
+      </ul>
+    </article>
+
+    <article class="card">
+      <h2>3. Duas redes isoladas, R1 e R2</h2>
+      <p>Exemplo usado: R1 é <code>192.168.1.0/24</code> e R2 é <code>192.168.2.0/24</code>.</p>
+      <ol>
+        <li><span class="k">Equipamento:</span> um roteador. Switch comum não serve, porque não trabalha na camada 3.</li>
+        <li><span class="k">Configuração do roteador:</span> uma interface em cada rede, <code>192.168.1.1/24</code> em R1 e <code>192.168.2.1/24</code> em R2, com roteamento habilitado.</li>
+        <li><span class="k">Configuração no PC de R1:</span> IP da faixa de R1, máscara <code>255.255.255.0</code> e gateway <code>192.168.1.1</code>.</li>
+        <li><span class="k">Verificação:</span> ping para o próprio gateway, depois para a interface do roteador em R2, depois para o PC de destino. O <code>tracert</code> mostra onde o caminho para. Ping sem resposta pode ser só ICMP bloqueado por firewall.</li>
+        <li><span class="k">Dentro de R1:</span> todos os IPs únicos, na mesma sub-rede e com a mesma máscara, sem usar o endereço de rede nem o de broadcast.</li>
+        <li><span class="k">Entre R1 e R2:</span> as duas sub-redes precisam ser diferentes e sem sobreposição, e nenhum IP pode se repetir.</li>
+      </ol>
+    </article>
+
+    <article class="card">
+      <h2>4. Tabela MAC</h2>
+      <p>Serve para dizer ao switch em qual porta está cada endereço MAC.</p>
+      <p>Fica na memória do próprio switch, uma por switch.</p>
+      <p>É necessária porque sem ela o switch teria que mandar o quadro por todas as portas, como um hub. Com ela, o quadro sai só pela porta certa. O switch preenche sozinho, lendo o MAC de origem dos quadros que recebe, e as entradas expiram por inatividade.</p>
+    </article>
+
+    <article class="card">
+      <h2>5. Tabela ARP</h2>
+      <p>Serve para descobrir qual endereço MAC corresponde a um endereço IP.</p>
+      <p>Fica na memória de cada host e também do roteador.</p>
+      <p>É necessária porque a aplicação usa IP, mas a entrega no cabo é feita por MAC. Quando não conhece o MAC, o host pergunta em broadcast quem tem aquele IP, e o dono responde. Se o destino está em outra rede, o host resolve o MAC do gateway, não o do destino final.</p>
+    </article>
+
+    <article class="card">
+      <h2>6. As duas redes montadas</h2>
+      <div class="topo">
+        <div class="lan">
+          <p class="lanhead">Rede R1 — 192.168.1.0/24 · gateway 192.168.1.1</p>
+          <div class="nodes">
+            <div class="node"><p class="nn">Switch SW1</p><p class="nc">sem IP, camada 2<br>guarda a tabela MAC</p></div>
+            <div class="node"><p class="nn">Access point AP1</p><p class="nc">SSID rede-r1, WPA3<br>ponte para a LAN, sem IP</p></div>
+            <div class="node"><p class="nn">PC1, cabo</p><p class="nc">192.168.1.10/24<br>GW 192.168.1.1<br>MAC 00:1A:2B:00:00:11</p></div>
+            <div class="node"><p class="nn">Note1, Wi-Fi</p><p class="nc">192.168.1.20/24<br>GW 192.168.1.1<br>MAC 00:1A:2B:00:00:12</p></div>
+          </div>
+        </div>
+        <div class="router">Roteador<br>eth0 192.168.1.1/24 · MAC 00:1A:2B:00:00:01<br>eth1 192.168.2.1/24 · MAC 00:1A:2B:00:00:02</div>
+        <div class="lan">
+          <p class="lanhead">Rede R2 — 192.168.2.0/24 · gateway 192.168.2.1</p>
+          <div class="nodes">
+            <div class="node"><p class="nn">Switch SW2</p><p class="nc">sem IP, camada 2<br>guarda a tabela MAC</p></div>
+            <div class="node"><p class="nn">Access point AP2</p><p class="nc">SSID rede-r2, WPA3<br>ponte para a LAN, sem IP</p></div>
+            <div class="node"><p class="nn">PC2, cabo</p><p class="nc">192.168.2.10/24<br>GW 192.168.2.1<br>MAC 00:1A:2B:00:00:21</p></div>
+            <div class="node"><p class="nn">Smartphone, Wi-Fi</p><p class="nc">192.168.2.20/24<br>GW 192.168.2.1<br>MAC 00:1A:2B:00:00:22</p></div>
+          </div>
+        </div>
+      </div>
+      <h3>Tabela MAC, que fica no switch SW1</h3>
+      <div class="scroller"><table class="tbl">
+        <tr><th>Porta</th><th>Endereço MAC</th><th>Dispositivo</th></tr>
+        <tr><td>Fa0/1</td><td>00:1A:2B:00:00:11</td><td>PC1</td></tr>
+        <tr><td>Fa0/2</td><td>00:1A:2B:00:00:12</td><td>Note1, pelo AP1</td></tr>
+        <tr><td>Fa0/24</td><td>00:1A:2B:00:00:01</td><td>Roteador</td></tr>
+      </table></div>
+      <h3>Tabela ARP, que fica no PC1</h3>
+      <div class="scroller"><table class="tbl">
+        <tr><th>Endereço IP</th><th>Endereço MAC</th><th>Dispositivo</th></tr>
+        <tr><td>192.168.1.1</td><td>00:1A:2B:00:00:01</td><td>Roteador, gateway</td></tr>
+        <tr><td>192.168.1.20</td><td>00:1A:2B:00:00:12</td><td>Note1</td></tr>
+      </table></div>
+      <p>Para falar com o PC2, em <code>192.168.2.10</code>, o PC1 não cria entrada ARP para esse IP. Ele usa o MAC do gateway, porque o ARP não atravessa o roteador.</p>
+    </article>
+
+  </section>
 </div>
 
 <script>
@@ -380,6 +530,15 @@ function start(s){
     renderMenu();
   }
 }
+document.querySelectorAll(".tab").forEach(function(b){
+  b.onclick=function(){
+    document.querySelectorAll(".tab").forEach(function(x){ x.classList.toggle("on", x===b); });
+    document.getElementById("view-jogo").hidden = b.dataset.v!=="jogo";
+    document.getElementById("view-teoria").hidden = b.dataset.v!=="teoria";
+    window.scrollTo({top:0,behavior:"smooth"});
+  };
+});
+
 if(window.claude && window.claude.hot && window.claude.hot.snapshot){
   window.claude.hot.snapshot(function(){ return {playlist:playlist,pi:pi,qi:qi,scores:scores}; });
 }
