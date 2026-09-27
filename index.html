@@ -117,6 +117,21 @@
   .nn{margin:0 0 3px;font-weight:600;font-size:14px}
   .nc{margin:0;font-family:var(--mono);font-size:12px;color:var(--muted);line-height:1.6}
   .router{border:1px solid var(--p1);border-radius:8px;padding:10px 12px;font-family:var(--mono);font-size:12px;text-align:center;line-height:1.6}
+  .deckpick{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+  .dchip{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:6px 14px;cursor:pointer;font-size:14px;color:var(--muted)}
+  .dchip:hover{border-color:var(--muted)}
+  .dchip.on{border-color:var(--p3);color:var(--ink);font-weight:600}
+  .fq{font-family:var(--display);font-size:22px;line-height:1.3;margin:6px 0 0;text-wrap:balance}
+  .fans{margin:18px 0 0;padding-top:16px;border-top:1px solid var(--line)}
+  .fans code{font-family:var(--mono);font-size:.9em;background:var(--paper);padding:1px 5px;border-radius:4px}
+  .fbtns{display:flex;gap:8px;margin-top:22px}
+  .fbtns button{flex:1;border-radius:8px;padding:11px 16px;cursor:pointer;font-weight:600}
+  .miss{background:none;border:1px solid var(--line);color:var(--muted)}
+  .miss:hover{border-color:var(--no);color:var(--no)}
+  .hit{background:var(--p2);border:none;color:var(--onaccent)}
+  .hit:hover{filter:brightness(1.08)}
+  .flip{width:100%;margin-top:22px;background:var(--p3);border:none;border-radius:8px;padding:11px 16px;color:var(--onaccent);font-weight:600;cursor:pointer}
+  .flip:hover{filter:brightness(1.08)}
 </style>
 
 <style>:root{color-scheme:light dark}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
@@ -125,12 +140,18 @@
 <div class="wrap">
   <p class="eyebrow">Estudo de redes</p>
   <h1>Rede em Quatro Pares</h1>
-  <p class="sub">A teoria dos seis exercícios e um quiz de cinco rodadas sobre ela: modelo OSI, montagem da LAN com Wi-Fi, ligação entre duas redes, as tabelas MAC e ARP, e a topologia completa.</p>
+  <p class="sub">Três modos de estudar os seis exercícios: um quiz de cinco rodadas, uma pilha de cartões para revisão rápida e a teoria escrita. Modelo OSI, montagem da LAN com Wi-Fi, ligação entre duas redes, tabelas MAC e ARP e a topologia completa.</p>
 
   <nav class="tabs">
     <button class="tab on" data-v="jogo">Jogo</button>
+    <button class="tab" data-v="cartoes">Cartões</button>
     <button class="tab" data-v="teoria">Teoria</button>
   </nav>
+
+  <section id="view-cartoes" hidden>
+    <div class="deckpick" id="deckpick"></div>
+    <div id="flashstage"></div>
+  </section>
 
   <section id="view-jogo">
     <div class="pairs" id="pairs"></div>
@@ -530,14 +551,147 @@ function start(s){
     renderMenu();
   }
 }
+const CARDS = [
+  { t:"Modelo OSI", q:"Quais são as sete camadas do OSI, da 7 para a 1?",
+    a:"Aplicação, apresentação, sessão, transporte, rede, enlace e física." },
+  { t:"Modelo OSI", q:"O que faz a camada de aplicação?",
+    a:"É o protocolo do serviço que o programa usa: HTTP, DNS, SMTP, FTP." },
+  { t:"Modelo OSI", q:"O que faz a camada de apresentação?",
+    a:"Cuida do formato, da codificação e da criptografia dos dados. TLS, JSON, JPEG, UTF-8." },
+  { t:"Modelo OSI", q:"O que faz a camada de sessão?",
+    a:"Abre, mantém, sincroniza e encerra o diálogo entre as duas pontas." },
+  { t:"Modelo OSI", q:"O que faz a camada de transporte?",
+    a:"Entrega fim a fim entre processos, usando portas. É onde ficam o TCP, confiável, e o UDP, sem garantia." },
+  { t:"Modelo OSI", q:"O que faz a camada de rede?",
+    a:"Endereçamento IP e roteamento entre redes diferentes. É onde age o roteador." },
+  { t:"Modelo OSI", q:"O que faz a camada de enlace?",
+    a:"Entrega o quadro dentro do segmento local, pelo endereço MAC. É onde age o switch." },
+  { t:"Modelo OSI", q:"O que faz a camada física?",
+    a:"Transmite os bits como sinal elétrico, óptico ou de rádio. Cabo UTP, fibra, RJ-45." },
+  { t:"Modelo OSI", q:"Em que camada estão switch, roteador, HTTP e cabo UTP?",
+    a:"Switch na 2, roteador na 3, HTTP na 7 e cabo UTP na 1." },
+
+  { t:"Montar a LAN", q:"Que hardware monta uma LAN com 5 PCs e acesso sem fio?",
+    a:"Roteador, switch, access point, placa de rede em cada PC, cabos UTP com RJ-45, e modem ou ONT se houver internet." },
+  { t:"Montar a LAN", q:"Onde se liga o access point?",
+    a:"Em uma porta LAN do switch, nunca na porta WAN do roteador." },
+  { t:"Montar a LAN", q:"Quem entra pelo Wi-Fi fica em outra rede?",
+    a:"Não. O access point é ponte de camada 2, então cabo e Wi-Fi dividem a mesma faixa de IP, a mesma máscara e o mesmo gateway." },
+  { t:"Montar a LAN", q:"Para que serve a máscara de sub-rede?",
+    a:"Separa a parte de rede da parte de host, e é ela que diz se o destino é local ou precisa ir pelo gateway." },
+  { t:"Montar a LAN", q:"Para que serve o gateway padrão?",
+    a:"É o IP do roteador na LAN, destino de todo pacote endereçado a outra rede." },
+  { t:"Montar a LAN", q:"Para que serve o DHCP?",
+    a:"Entrega IP, máscara, gateway e DNS automaticamente aos hosts." },
+  { t:"Montar a LAN", q:"Para que serve o NAT?",
+    a:"Troca o IP privado pelo IP público na saída para a internet, deixando todos os hosts usarem um único endereço externo." },
+  { t:"Montar a LAN", q:"O que é essencial configurar na rede sem fio?",
+    a:"O SSID, que é o nome da rede, e a segurança WPA2 ou WPA3, que autentica e cifra o rádio." },
+
+  { t:"R1 e R2", q:"O que liga duas redes com endereçamento diferente?",
+    a:"Um roteador, ou um switch de camada 3. Switch comum só encaminha dentro do mesmo domínio de broadcast." },
+  { t:"R1 e R2", q:"O que configurar no roteador que une R1 e R2?",
+    a:"Uma interface com IP em cada rede, <code>192.168.1.1/24</code> em R1 e <code>192.168.2.1/24</code> em R2, com roteamento habilitado e sem NAT entre elas." },
+  { t:"R1 e R2", q:"O que o PC de R1 precisa para falar com um host de R2?",
+    a:"IP da faixa de R1, máscara correta e gateway padrão apontando para o IP do roteador em R1." },
+  { t:"R1 e R2", q:"Como testar a conectividade entre as duas redes?",
+    a:"Do mais perto para o mais longe: ping no próprio gateway, depois na interface do roteador em R2, depois no host de destino. O <code>tracert</code> mostra em que salto o caminho para." },
+  { t:"R1 e R2", q:"O ping não responde. A rede caiu?",
+    a:"Não necessariamente. O ping usa ICMP, que muitos firewalls bloqueiam. Vale testar a porta da aplicação antes de concluir." },
+  { t:"R1 e R2", q:"Qual o requisito de endereçamento dentro de R1?",
+    a:"Mesma sub-rede e mesma máscara para todos, IPs únicos, sem usar o endereço de rede nem o de broadcast." },
+  { t:"R1 e R2", q:"Qual o requisito entre R1 e R2?",
+    a:"Sub-redes diferentes e sem sobreposição de faixas, e nenhum IP repetido entre as duas." },
+
+  { t:"MAC e ARP", q:"O que é a tabela MAC e onde ela fica?",
+    a:"Associa cada endereço MAC à porta do switch em que ele foi visto. Fica na memória do próprio switch, uma por switch." },
+  { t:"MAC e ARP", q:"Por que a tabela MAC é necessária?",
+    a:"Sem ela o switch teria que inundar todas as portas, como um hub. Com ela, o quadro sai só pela porta certa." },
+  { t:"MAC e ARP", q:"Como o switch preenche a tabela MAC?",
+    a:"Sozinho: lê o MAC de origem dos quadros que recebe e registra a porta. As entradas expiram por inatividade." },
+  { t:"MAC e ARP", q:"O que é a tabela ARP e onde ela fica?",
+    a:"Associa um endereço IP ao MAC correspondente. Fica na memória de cada host e também do roteador." },
+  { t:"MAC e ARP", q:"Por que o ARP é necessário?",
+    a:"A aplicação trabalha com IP, mas a entrega física é por MAC, e o quadro precisa de um MAC de destino. O ARP é a ponte entre a camada 3 e a camada 2." },
+  { t:"MAC e ARP", q:"Como o ARP descobre um MAC?",
+    a:"Envia um ARP Request em broadcast perguntando quem tem aquele IP. O dono responde em unicast e o par entra no cache." },
+  { t:"MAC e ARP", q:"O destino está em outra rede. Qual MAC vai no quadro?",
+    a:"O do gateway. O IP de destino continua sendo o final, mas o MAC é sempre o do próximo salto." },
+
+  { t:"Montar a rede", q:"Na topologia de R1 e R2, quantas redes existem?",
+    a:"Duas, uma por LAN. Switches e access points não criam rede nova." },
+  { t:"Montar a rede", q:"Qual a configuração essencial de um PC na rede?",
+    a:"IP, máscara, gateway e DNS. Por exemplo <code>192.168.1.10/24</code> com gateway <code>192.168.1.1</code>." },
+  { t:"Montar a rede", q:"Qual a configuração essencial de um access point?",
+    a:"SSID com WPA2 ou WPA3, ligado a uma porta do switch. Ele não precisa de IP de rede nem roteia nada." },
+  { t:"Montar a rede", q:"O endereço MAC é configurado?",
+    a:"Não, vem gravado de fábrica na placa de rede. Ele aparece no desenho porque as tabelas MAC e ARP são feitas dele." },
+  { t:"Montar a rede", q:"Qual o caminho de um quadro do PC1, em R1, até o PC2, em R2?",
+    a:"PC1, switch SW1, roteador, switch SW2, PC2. O par de IPs não muda; o par de MACs é reescrito a cada salto." }
+];
+
+const DECKS = ["Todos","Modelo OSI","Montar a LAN","R1 e R2","MAC e ARP","Montar a rede"];
+let deckName="Todos", deck=[], di=0, flipped=false, hits=0, missed=[];
+const deckEl=document.getElementById("deckpick"), flashEl=document.getElementById("flashstage");
+
+function drawDecks(){
+  deckEl.innerHTML=DECKS.map(function(d){
+    const n = d==="Todos" ? CARDS.length : CARDS.filter(function(c){ return c.t===d; }).length;
+    return '<button class="dchip'+(d===deckName?" on":"")+'" data-d="'+d+'">'+d+' <span style="opacity:.6">'+n+'</span></button>';
+  }).join("");
+  deckEl.querySelectorAll(".dchip").forEach(function(b){
+    b.onclick=function(){ deckName=b.dataset.d; buildDeck(); };
+  });
+}
+
+function buildDeck(list){
+  deck = list || (deckName==="Todos" ? CARDS.slice() : CARDS.filter(function(c){ return c.t===deckName; }));
+  di=0; flipped=false; hits=0; missed=[];
+  drawDecks(); drawCard();
+}
+
+function drawCard(){
+  if(di>=deck.length) return drawDeckEnd();
+  const c=deck[di];
+  flashEl.innerHTML='<div class="card">'+
+    '<div class="tag"><span>'+c.t+' · '+(di+1)+' de '+deck.length+'</span><span class="score">acertos '+hits+'</span></div>'+
+    '<p class="fq">'+c.q+'</p>'+
+    (flipped ? '<div class="fans"><p style="margin:0">'+c.a+'</p></div>'+
+      '<div class="fbtns"><button class="miss" id="miss">Não sabia</button><button class="hit" id="hit">Sabia</button></div>'
+      : '<button class="flip" id="flip">Mostrar resposta</button>')+'</div>';
+  if(flipped){
+    document.getElementById("hit").onclick=function(){ hits++; di++; flipped=false; drawCard(); };
+    document.getElementById("miss").onclick=function(){ missed.push(deck[di]); di++; flipped=false; drawCard(); };
+    document.getElementById("hit").focus();
+  } else {
+    const f=document.getElementById("flip");
+    f.onclick=function(){ flipped=true; drawCard(); };
+    f.focus();
+  }
+}
+
+function drawDeckEnd(){
+  const n=deck.length;
+  flashEl.innerHTML='<div class="card final"><h2>Fim da pilha</h2>'+
+    '<p class="why">'+hits+' de '+n+' você sabia'+(missed.length?', e '+missed.length+' ficaram para revisar.':'. Pilha limpa.')+'</p>'+
+    (missed.length?'<button class="next" id="redo">Revisar os '+missed.length+'</button>':'')+
+    '<button class="'+(missed.length?"ghost":"next")+'" id="restart">Começar de novo</button></div>';
+  if(missed.length){
+    const again=missed.slice();
+    document.getElementById("redo").onclick=function(){ buildDeck(again); window.scrollTo({top:0,behavior:"smooth"}); };
+  }
+  document.getElementById("restart").onclick=function(){ buildDeck(); window.scrollTo({top:0,behavior:"smooth"}); };
+}
+
+const VIEWS=["jogo","cartoes","teoria"];
 document.querySelectorAll(".tab").forEach(function(b){
   b.onclick=function(){
     document.querySelectorAll(".tab").forEach(function(x){ x.classList.toggle("on", x===b); });
-    document.getElementById("view-jogo").hidden = b.dataset.v!=="jogo";
-    document.getElementById("view-teoria").hidden = b.dataset.v!=="teoria";
+    VIEWS.forEach(function(v){ document.getElementById("view-"+v).hidden = b.dataset.v!==v; });
     window.scrollTo({top:0,behavior:"smooth"});
   };
 });
+buildDeck();
 
 if(window.claude && window.claude.hot && window.claude.hot.snapshot){
   window.claude.hot.snapshot(function(){ return {playlist:playlist,pi:pi,qi:qi,scores:scores}; });
