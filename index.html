@@ -103,6 +103,13 @@
   .theory li{margin-bottom:5px}
   .theory .k{font-weight:600}
   .theory code{font-family:var(--mono);font-size:.9em;background:var(--paper);padding:1px 5px;border-radius:4px}
+  .tindex{margin:0;padding-left:20px}
+  .tindex li{margin-bottom:6px}
+  .tindex a{color:var(--text,inherit);text-decoration:none;border-bottom:1px solid var(--line)}
+  .tindex a:hover{border-bottom-color:var(--p1)}
+  .pre{font-family:var(--mono);font-size:12.5px;line-height:1.65;background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin:10px 0 14px;overflow-x:auto;white-space:pre}
+  .note{background:var(--paper);border-left:3px solid var(--p1);border-radius:0;padding:12px 14px;margin:14px 0;font-size:15px}
+  .theory h2[id]{scroll-margin-top:16px}
   .scroller{overflow-x:auto}
   .tbl{width:100%;border-collapse:collapse;margin:6px 0 14px;font-size:14px}
   .tbl th,.tbl td{text-align:left;border-bottom:1px solid var(--line);padding:7px 14px 7px 0;white-space:nowrap}
@@ -162,81 +169,422 @@
   <section id="view-teoria" class="theory" hidden>
 
     <article class="card">
-      <h2>1. Camadas do modelo OSI</h2>
-      <p>São sete camadas. Os dados descem da 7 para a 1 na origem, ganhando um cabeçalho em cada uma, e sobem da 1 para a 7 no destino.</p>
-      <ul>
-        <li><span class="k">Camada 7, aplicação:</span> protocolo do serviço que o programa usa, como HTTP, DNS e SMTP.</li>
-        <li><span class="k">Camada 6, apresentação:</span> formato, codificação e criptografia dos dados. TLS, JSON, UTF-8.</li>
-        <li><span class="k">Camada 5, sessão:</span> abre, mantém e encerra o diálogo entre as duas pontas.</li>
-        <li><span class="k">Camada 4, transporte:</span> entrega fim a fim entre processos, usando portas. TCP e UDP.</li>
-        <li><span class="k">Camada 3, rede:</span> endereçamento IP e roteamento entre redes diferentes. É onde age o roteador.</li>
-        <li><span class="k">Camada 2, enlace:</span> entrega dentro do segmento local, por endereço MAC. É onde age o switch.</li>
-        <li><span class="k">Camada 1, física:</span> transmite os bits pelo cabo, pela fibra ou pelo rádio.</li>
-      </ul>
-      <p>Na prática o que roda é o modelo TCP/IP, que junta as camadas 5, 6 e 7 em uma só camada de aplicação, e as camadas 1 e 2 em uma camada de acesso à rede.</p>
-    </article>
-
-    <article class="card">
-      <h2>2. Rede local com 5 PCs e acesso sem fio</h2>
-      <h3>Hardware necessário</h3>
-      <ul>
-        <li>Roteador, que faz gateway, DHCP e NAT</li>
-        <li>Switch, para ligar os PCs cabeados</li>
-        <li>Access point, para o Wi-Fi</li>
-        <li>Placa de rede em cada PC</li>
-        <li>Cabos UTP com conector RJ-45</li>
-        <li>Modem ou ONT, se houver internet</li>
-      </ul>
-      <h3>Como conectar</h3>
-      <ol>
-        <li>Modem na porta WAN do roteador.</li>
-        <li>Porta LAN do roteador no switch.</li>
-        <li>Cada PC em uma porta do switch.</li>
-        <li>Access point em uma porta do switch, nunca na WAN.</li>
-        <li>Notebooks e celulares conectam no SSID.</li>
-      </ol>
-      <p>Os dispositivos sem fio ficam na mesma rede lógica dos cabeados, porque o access point é uma ponte de camada 2.</p>
-      <h3>Configuração lógica</h3>
-      <ul>
-        <li><span class="k">IP:</span> identifica cada host e não pode repetir.</li>
-        <li><span class="k">Máscara:</span> separa a parte de rede da parte de host e define se o destino é local.</li>
-        <li><span class="k">Gateway padrão:</span> por onde sai o tráfego destinado a outras redes.</li>
-        <li><span class="k">DNS:</span> traduz nome em IP.</li>
-        <li><span class="k">DHCP:</span> entrega IP, máscara, gateway e DNS automaticamente.</li>
-        <li><span class="k">SSID com WPA2 ou WPA3:</span> nome e segurança da rede sem fio.</li>
-        <li><span class="k">NAT:</span> troca o IP privado pelo público na saída para a internet.</li>
-      </ul>
-    </article>
-
-    <article class="card">
-      <h2>3. Duas redes isoladas, R1 e R2</h2>
-      <p>Exemplo usado: R1 é <code>192.168.1.0/24</code> e R2 é <code>192.168.2.0/24</code>.</p>
-      <ol>
-        <li><span class="k">Equipamento:</span> um roteador. Switch comum não serve, porque não trabalha na camada 3.</li>
-        <li><span class="k">Configuração do roteador:</span> uma interface em cada rede, <code>192.168.1.1/24</code> em R1 e <code>192.168.2.1/24</code> em R2, com roteamento habilitado.</li>
-        <li><span class="k">Configuração no PC de R1:</span> IP da faixa de R1, máscara <code>255.255.255.0</code> e gateway <code>192.168.1.1</code>.</li>
-        <li><span class="k">Verificação:</span> ping para o próprio gateway, depois para a interface do roteador em R2, depois para o PC de destino. O <code>tracert</code> mostra onde o caminho para. Ping sem resposta pode ser só ICMP bloqueado por firewall.</li>
-        <li><span class="k">Dentro de R1:</span> todos os IPs únicos, na mesma sub-rede e com a mesma máscara, sem usar o endereço de rede nem o de broadcast.</li>
-        <li><span class="k">Entre R1 e R2:</span> as duas sub-redes precisam ser diferentes e sem sobreposição, e nenhum IP pode se repetir.</li>
+      <h2>Índice</h2>
+      <ol class="tindex">
+        <li><a href="#c1">Modelo OSI: as sete camadas</a></li>
+        <li><a href="#c2">Configuração física da rede local</a></li>
+        <li><a href="#c3">Configuração lógica da rede local</a></li>
+        <li><a href="#c4">Endereçamento IP: rede, broadcast e hosts válidos</a></li>
+        <li><a href="#c5">Gateway</a></li>
+        <li><a href="#c6">ARP: por que ele é necessário</a></li>
+        <li><a href="#c7">DHCP: como funciona</a></li>
+        <li><a href="#c8">Tabela MAC e tabela ARP lado a lado</a></li>
+        <li><a href="#c9">Duas redes locais ligadas por um roteador</a></li>
+        <li><a href="#c10">A topologia montada</a></li>
+        <li><a href="#c11">Comandos de diagnóstico</a></li>
+        <li><a href="#c12">Erros que mais derrubam uma rede</a></li>
       </ol>
     </article>
 
     <article class="card">
-      <h2>4. Tabela MAC</h2>
-      <p>Serve para dizer ao switch em qual porta está cada endereço MAC.</p>
-      <p>Fica na memória do próprio switch, uma por switch.</p>
-      <p>É necessária porque sem ela o switch teria que mandar o quadro por todas as portas, como um hub. Com ela, o quadro sai só pela porta certa. O switch preenche sozinho, lendo o MAC de origem dos quadros que recebe, e as entradas expiram por inatividade.</p>
+      <h2 id="c1">1. Modelo OSI: as sete camadas</h2>
+      <p>O modelo OSI é um modelo de referência. Ele divide a comunicação em rede em sete camadas, cada uma com uma responsabilidade própria. A camada de cima usa os serviços da camada de baixo e não precisa saber como ela faz o trabalho. Essa separação é o que permite trocar o cabo por Wi-Fi sem reescrever o navegador, ou trocar o navegador sem mexer no cabo.</p>
+      <p>Na origem, os dados descem da camada 7 até a camada 1. Cada camada acrescenta o seu próprio cabeçalho, o que se chama encapsulamento. No destino o caminho é inverso: cada camada retira o seu cabeçalho e entrega o conteúdo para a camada de cima. Por isso o nome de cada unidade muda conforme a camada.</p>
+
+      <h3>Camada 7 — Aplicação</h3>
+      <p>É a camada do protocolo que o programa usa para conversar. Não é o programa em si: o navegador é um programa, o HTTP é o protocolo da camada 7. Exemplos: HTTP e HTTPS para páginas, DNS para resolver nomes, SMTP e IMAP para e-mail, FTP e SSH para arquivos e acesso remoto.</p>
+
+      <h3>Camada 6 — Apresentação</h3>
+      <p>Cuida de como os dados estão representados: codificação de caracteres como UTF-8, formatos como JSON e JPEG, compressão e criptografia. O TLS, que transforma HTTP em HTTPS, atua aqui. É a camada que garante que o que uma ponta escreveu a outra consegue interpretar.</p>
+
+      <h3>Camada 5 — Sessão</h3>
+      <p>Estabelece, mantém, sincroniza e encerra o diálogo entre as duas pontas. É quem sabe que aquelas várias trocas de mensagens pertencem à mesma conversa, e quem retoma de onde parou quando uma transferência longa é interrompida.</p>
+
+      <h3>Camada 4 — Transporte</h3>
+      <p>Faz a entrega fim a fim entre processos, não entre máquinas. Quem identifica o processo é o número de porta: 80 para HTTP, 443 para HTTPS, 53 para DNS. A camada 4 também quebra os dados em segmentos, controla o fluxo e, no caso do TCP, garante que tudo chegou e na ordem certa. O UDP não garante nada, e por isso é mais rápido e serve para voz, vídeo e jogos.</p>
+      <div class="note">Diferença que costuma cair: o IP, da camada 3, leva o pacote até a máquina certa. A porta, da camada 4, leva até o programa certo dentro daquela máquina.</div>
+
+      <h3>Camada 3 — Rede</h3>
+      <p>Faz o endereçamento lógico, com endereço IP, e o roteamento entre redes diferentes. É a camada onde o roteador trabalha. Também é aqui que vive o ICMP, o protocolo usado pelo ping e pelo tracert, e o campo TTL, que impede um pacote de circular para sempre.</p>
+
+      <h3>Camada 2 — Enlace</h3>
+      <p>Entrega o quadro dentro do mesmo segmento local, usando endereço físico, o MAC. É a camada do switch, do Ethernet e do Wi-Fi. Também faz detecção de erro no quadro. O ARP fica na fronteira entre a camada 3 e a camada 2, porque é ele que traduz IP em MAC.</p>
+
+      <h3>Camada 1 — Física</h3>
+      <p>Transmite os bits como sinal: elétrico no cabo de par trançado, óptico na fibra, ou de rádio no Wi-Fi. Define conectores, pinagem, tensão e taxa de transmissão. Cabo partido, conector mal crimpado e porta queimada são problemas de camada 1.</p>
+
+      <h3>Resumo das sete camadas</h3>
+      <div class="scroller"><table class="tbl">
+        <tr><th>Nº</th><th>Camada</th><th>Função</th><th>Unidade</th><th>Exemplos</th></tr>
+        <tr><td>7</td><td>Aplicação</td><td>Protocolo do serviço usado pelo programa</td><td>Dados</td><td>HTTP, DNS, SMTP</td></tr>
+        <tr><td>6</td><td>Apresentação</td><td>Formato, codificação e criptografia</td><td>Dados</td><td>TLS, JSON, UTF-8</td></tr>
+        <tr><td>5</td><td>Sessão</td><td>Abre, mantém e encerra o diálogo</td><td>Dados</td><td>RPC, NetBIOS</td></tr>
+        <tr><td>4</td><td>Transporte</td><td>Entrega fim a fim entre processos, com portas</td><td>Segmento</td><td>TCP, UDP</td></tr>
+        <tr><td>3</td><td>Rede</td><td>Endereçamento IP e roteamento entre redes</td><td>Pacote</td><td>IP, ICMP, roteador</td></tr>
+        <tr><td>2</td><td>Enlace</td><td>Entrega local por endereço MAC</td><td>Quadro</td><td>Ethernet, Wi-Fi, switch</td></tr>
+        <tr><td>1</td><td>Física</td><td>Transmite os bits pelo meio</td><td>Bit</td><td>Cabo UTP, fibra, RJ-45</td></tr>
+      </table></div>
+
+      <h3>OSI e TCP/IP</h3>
+      <p>O OSI é um modelo de estudo. O que roda de fato nas redes é a pilha TCP/IP, que agrupa as camadas 5, 6 e 7 em uma única camada de aplicação, e as camadas 1 e 2 em uma camada de acesso à rede. O OSI continua sendo útil como linguagem comum: dizer que um problema é de camada 3 significa falta de rota ou IP errado, enquanto camada 7 significa que a rede entregou e quem falhou foi a aplicação.</p>
     </article>
 
     <article class="card">
-      <h2>5. Tabela ARP</h2>
-      <p>Serve para descobrir qual endereço MAC corresponde a um endereço IP.</p>
-      <p>Fica na memória de cada host e também do roteador.</p>
-      <p>É necessária porque a aplicação usa IP, mas a entrega no cabo é feita por MAC. Quando não conhece o MAC, o host pergunta em broadcast quem tem aquele IP, e o dono responde. Se o destino está em outra rede, o host resolve o MAC do gateway, não o do destino final.</p>
+      <h2 id="c2">2. Configuração física da rede local</h2>
+      <p>Montar uma rede local tem duas metades. A física trata dos equipamentos e dos cabos: o que se compra e onde se liga. A lógica trata dos endereços e dos serviços: o que se configura em cada máquina. As duas precisam estar certas. Uma rede fisicamente perfeita com IP errado não funciona, e o contrário também vale.</p>
+
+      <h3>Placa de rede e endereço MAC</h3>
+      <p>A placa de rede, ou NIC, é a interface que liga o computador ao meio. Pode ser Ethernet, com conector RJ-45, ou Wi-Fi. Um notebook normalmente tem as duas, e nesse caso ele tem dois endereços MAC, um por interface.</p>
+      <p>O endereço MAC é o identificador físico da placa. Tem 48 bits, escritos como seis pares hexadecimais separados por dois-pontos ou hífen. Ele vem gravado de fábrica e não é configurado pelo usuário.</p>
+      <div class="pre">00:1A:2B:00:00:11
+|________| |______|
+   OUI      serial
+
+OUI    = 3 primeiros bytes, identificam o fabricante
+serial = 3 últimos bytes, identificam a placa</div>
+      <p>Existe um MAC especial: <code>FF:FF:FF:FF:FF:FF</code> é o endereço de broadcast da camada 2. Um quadro enviado para ele é entregue a todos os dispositivos do segmento local. O ARP usa esse endereço para perguntar quem tem um determinado IP.</p>
+
+      <h3>Switch e tabela MAC</h3>
+      <p>O switch interliga os dispositivos da mesma rede. Ele trabalha na camada 2: recebe um quadro, lê o endereço MAC de destino e encaminha apenas pela porta onde aquele MAC está. Para saber qual porta é qual, ele mantém a tabela MAC, também chamada tabela CAM.</p>
+      <p>A tabela não é configurada: o switch aprende sozinho. Sempre que um quadro chega, ele lê o MAC de origem e anota que aquele endereço está naquela porta. Veja o aprendizado acontecendo:</p>
+      <ol>
+        <li>A tabela começa vazia. O PC1, na porta Fa0/1, envia um quadro para o PC2.</li>
+        <li>O switch lê o MAC de origem e grava: Fa0/1 pertence ao MAC do PC1.</li>
+        <li>Como ainda não conhece o MAC de destino, o switch envia o quadro por todas as portas, menos a de entrada. Isso se chama inundação, ou flooding.</li>
+        <li>O PC2 responde. O switch lê o MAC de origem da resposta e grava: Fa0/3 pertence ao MAC do PC2.</li>
+        <li>A partir daqui, a conversa entre PC1 e PC2 sai apenas pelas portas corretas. O restante da rede não vê mais esse tráfego.</li>
+      </ol>
+      <p>As entradas expiram por inatividade, tipicamente em torno de cinco minutos, para que a tabela acompanhe mudanças de lugar dos equipamentos. Em switches gerenciáveis a tabela é consultada com <code>show mac address-table</code>.</p>
+      <div class="note">Sem tabela MAC o switch se comportaria como um hub, repetindo tudo por todas as portas. Isso desperdiça banda e deixa o tráfego visível para todo mundo. A tabela MAC é o que diferencia um switch de um hub.</div>
+
+      <h3>Access point</h3>
+      <p>O access point cria a rede sem fio. Ele é uma ponte de camada 2: pega o quadro que chegou pelo rádio e o coloca na rede cabeada, e vice-versa. Não roteia, não cria uma rede nova e não precisa de um IP para funcionar como ponte. Um IP de gerência pode existir, mas serve só para administrar o próprio equipamento.</p>
+      <p>A consequência prática é importante: quem entra pelo Wi-Fi fica na mesma rede lógica de quem está no cabo. Mesma faixa de IP, mesma máscara, mesmo gateway, mesmo domínio de broadcast.</p>
+
+      <h3>Roteador</h3>
+      <p>O roteador liga redes diferentes. Ele trabalha na camada 3: olha o endereço IP de destino, consulta a tabela de rotas e decide por qual interface o pacote sai. Cada interface dele tem um IP dentro da rede a que está conectada, e esse IP é o gateway daquela rede.</p>
+      <p>Um roteador doméstico junta várias funções em uma caixa só: roteador, switch de poucas portas, access point, servidor DHCP e NAT. Em prova, vale separar os papéis.</p>
+
+      <h3>Hub, switch e roteador</h3>
+      <div class="scroller"><table class="tbl">
+        <tr><th>Equipamento</th><th>Camada</th><th>Como decide o encaminhamento</th><th>Separa broadcast</th></tr>
+        <tr><td>Hub</td><td>1</td><td>Não decide: repete o sinal em todas as portas</td><td>Não</td></tr>
+        <tr><td>Switch</td><td>2</td><td>Pela tabela MAC: porta do MAC de destino</td><td>Não</td></tr>
+        <tr><td>Roteador</td><td>3</td><td>Pela tabela de rotas: rede do IP de destino</td><td>Sim</td></tr>
+      </table></div>
+
+      <h3>Como conectar cinco PCs com acesso sem fio</h3>
+      <p>Cenário do exercício: cinco computadores por cabo e também acesso Wi-Fi para notebooks e celulares. O hardware necessário é este:</p>
+      <ul>
+        <li>Modem ou ONT, que termina o link da operadora. Só é necessário se houver internet.</li>
+        <li>Roteador, que separa a LAN da internet e faz gateway, DHCP e NAT.</li>
+        <li>Switch, para ligar os cinco PCs. Cinco máquinas mais o uplink exigem seis portas, então um switch de oito portas resolve com folga.</li>
+        <li>Access point, para o Wi-Fi. Pode ser o rádio embutido no roteador.</li>
+        <li>Placa de rede em cada PC.</li>
+        <li>Cabos de par trançado Cat5e ou Cat6 com conectores RJ-45.</li>
+      </ul>
+      <p>A ligação segue esta ordem:</p>
+      <ol>
+        <li>O cabo da operadora entra no modem ou ONT.</li>
+        <li>O modem liga na porta WAN do roteador. É a única porta que recebe a internet.</li>
+        <li>Uma porta LAN do roteador liga em uma porta do switch. É um cabo só, chamado uplink.</li>
+        <li>Cada um dos cinco PCs liga em uma porta do switch.</li>
+        <li>O access point liga em outra porta do switch, nunca na porta WAN.</li>
+        <li>Notebooks e celulares se conectam ao SSID do access point.</li>
+      </ol>
     </article>
 
     <article class="card">
-      <h2>6. As duas redes montadas</h2>
+      <h2 id="c3">3. Configuração lógica da rede local</h2>
+      <p>Com os cabos no lugar, a rede ainda não funciona. Falta dar a cada máquina a informação de onde ela está e por onde sai. São estes os elementos.</p>
+
+      <h3>Endereço IP</h3>
+      <p>Identifica o host na camada 3. Dentro de uma mesma rede ele precisa ser único: dois hosts com o mesmo IP causam conflito e os dois ficam instáveis. O IP pode ser fixo, digitado à mão, ou dinâmico, entregue pelo DHCP.</p>
+
+      <h3>Máscara de sub-rede</h3>
+      <p>A máscara divide o endereço em duas partes: qual pedaço identifica a rede e qual identifica o host. É ela que responde à pergunta mais importante que o computador faz antes de enviar qualquer coisa: o destino está na minha rede, ou preciso mandar para o roteador? O capítulo 4 mostra essa conta em detalhe.</p>
+
+      <h3>Gateway padrão</h3>
+      <p>É o IP do roteador dentro da rede local. Todo pacote destinado a um endereço que não pertence à rede local é entregue a ele. Sem gateway configurado, o host consegue falar com os vizinhos e mais nada, nem internet nem outra rede interna.</p>
+
+      <h3>Servidor DNS</h3>
+      <p>Traduz nome em endereço IP. Sem DNS a rede continua funcionando por IP, mas nada resolve por nome. É um sintoma clássico: o ping para <code>8.8.8.8</code> responde e o ping para um site falha. Isso aponta DNS, não conectividade.</p>
+
+      <h3>DHCP</h3>
+      <p>Distribui automaticamente IP, máscara, gateway e DNS. Evita erro de digitação e IP repetido. O capítulo 7 detalha o funcionamento.</p>
+
+      <h3>SSID e segurança sem fio</h3>
+      <p>O SSID é o nome da rede sem fio. A segurança, WPA2 ou WPA3, autentica quem entra e cifra o tráfego de rádio. Rede aberta significa que qualquer pessoa no alcance entra e enxerga o tráfego.</p>
+
+      <h3>NAT</h3>
+      <p>Traduz os endereços privados da rede local para o endereço público na saída para a internet. É o que permite dezenas de máquinas usarem um único IP público. O NAT serve para a saída externa, e não deve ser usado entre duas redes internas que precisam se enxergar.</p>
+
+      <h3>Exemplo completo de configuração</h3>
+      <div class="scroller"><table class="tbl">
+        <tr><th>Parâmetro</th><th>Valor</th><th>Por quê</th></tr>
+        <tr><td>Rede</td><td>192.168.0.0/24</td><td>Faixa privada, 254 hosts, suficiente</td></tr>
+        <tr><td>Gateway</td><td>192.168.0.1</td><td>Primeiro endereço útil, convenção comum</td></tr>
+        <tr><td>Máscara</td><td>255.255.255.0</td><td>Equivale ao prefixo /24</td></tr>
+        <tr><td>Faixa DHCP</td><td>192.168.0.100 a .200</td><td>Deixa .2 a .99 livres para IP fixo</td></tr>
+        <tr><td>DNS</td><td>192.168.0.1 ou 1.1.1.1</td><td>O próprio roteador ou um DNS público</td></tr>
+        <tr><td>SSID</td><td>casa-lan, com WPA3</td><td>Wi-Fi na mesma rede dos cabeados</td></tr>
+      </table></div>
+    </article>
+
+    <article class="card">
+      <h2 id="c4">4. Endereçamento IP: rede, broadcast e hosts válidos</h2>
+      <p>Um endereço IPv4 tem 32 bits, escritos como quatro números de 0 a 255 separados por ponto. Cada número ocupa 8 bits e se chama octeto. O endereço sozinho não diz nada: é a máscara que define onde termina a parte de rede e onde começa a parte de host.</p>
+
+      <h3>Máscara e prefixo</h3>
+      <p>A máscara também tem 32 bits. Os bits 1, sempre à esquerda e sem buracos, marcam a parte de rede. Os bits 0, à direita, marcam a parte de host. O prefixo, escrito com barra, é apenas a quantidade de bits 1.</p>
+      <div class="pre">/24  =  255.255.255.0    =  11111111.11111111.11111111.00000000
+/25  =  255.255.255.128  =  11111111.11111111.11111111.10000000
+/26  =  255.255.255.192  =  11111111.11111111.11111111.11000000
+/27  =  255.255.255.224  =  11111111.11111111.11111111.11100000
+/28  =  255.255.255.240  =  11111111.11111111.11111111.11110000</div>
+
+      <h3>As três contas</h3>
+      <p>Dado um IP e uma máscara, três valores interessam. O método é sempre o mesmo.</p>
+      <ul>
+        <li><span class="k">Endereço de rede:</span> faz-se o E lógico, ou AND, entre o IP e a máscara, bit a bit. Na prática, zera-se toda a parte de host. Esse endereço identifica a rede e não pode ser dado a nenhum host.</li>
+        <li><span class="k">Endereço de broadcast:</span> é o último endereço da faixa. Ligam-se todos os bits da parte de host em 1. Também não pode ser dado a nenhum host.</li>
+        <li><span class="k">Hosts válidos:</span> é tudo que está entre os dois. A quantidade é 2 elevado a h, menos 2, onde h é o número de bits de host. Os dois que saem da conta são exatamente o endereço de rede e o de broadcast.</li>
+      </ul>
+
+      <h3>Exemplo 1: 192.168.1.10 com máscara /24</h3>
+      <p>Com /24, os 24 primeiros bits são rede e os 8 últimos são host. Como o corte cai exatamente no fim de um octeto, a conta é direta: o último octeto inteiro é a parte de host.</p>
+      <div class="pre">IP       192.168.1 . 10
+Máscara  255.255.255 . 0
+
+Rede         192.168.1.0     (último octeto zerado)
+Broadcast    192.168.1.255   (último octeto no máximo)
+Hosts        192.168.1.1 até 192.168.1.254
+Quantidade   2^8 - 2 = 254</div>
+
+      <h3>Exemplo 2: 192.168.1.200 com máscara /26</h3>
+      <p>Aqui o corte cai no meio do último octeto. Com /26 sobram 6 bits de host, e o bloco tem 2 elevado a 6, ou seja, 64 endereços. As redes /26 começam de 64 em 64: 0, 64, 128 e 192.</p>
+      <div class="pre">Tamanho do bloco   256 - 192 = 64
+Blocos possíveis   .0  .64  .128  .192
+
+O host .200 cai no bloco que começa em .192
+
+Rede         192.168.1.192
+Broadcast    192.168.1.255   (192 + 64 - 1)
+Hosts        192.168.1.193 até 192.168.1.254
+Quantidade   2^6 - 2 = 62</div>
+      <div class="note">Atalho útil: subtraia o último octeto da máscara de 256 e você obtém o tamanho do bloco. Para /26, 256 menos 192 dá 64. Depois é só achar em qual múltiplo desse número o host cai.</div>
+
+      <h3>Exemplo 3: 10.0.5.130 com máscara /25</h3>
+      <p>Com /25 sobram 7 bits de host, e o bloco tem 128 endereços. As redes /25 começam em 0 e em 128.</p>
+      <div class="pre">Tamanho do bloco   256 - 128 = 128
+Blocos possíveis   .0   .128
+
+O host .130 cai no bloco que começa em .128
+
+Rede         10.0.5.128
+Broadcast    10.0.5.255
+Hosts        10.0.5.129 até 10.0.5.254
+Quantidade   2^7 - 2 = 126</div>
+
+      <h3>Exemplo 4: 172.16.20.77 com máscara /20</h3>
+      <p>Quando o prefixo é menor que 24, o corte acontece no terceiro octeto. Com /20, os 4 primeiros bits do terceiro octeto são rede, e os outros 4, mais o quarto octeto inteiro, são host.</p>
+      <div class="pre">Máscara /20        255.255.240.0
+Tamanho do bloco   256 - 240 = 16   (no TERCEIRO octeto)
+Blocos possíveis   .0  .16  .32  .48 ...
+
+O terceiro octeto vale 20, que cai no bloco que começa em 16
+
+Rede         172.16.16.0
+Broadcast    172.16.31.255   (16 + 16 - 1 = 31 no terceiro octeto)
+Hosts        172.16.16.1 até 172.16.31.254
+Quantidade   2^12 - 2 = 4094</div>
+
+      <h3>Tabela de consulta rápida</h3>
+      <div class="scroller"><table class="tbl">
+        <tr><th>Prefixo</th><th>Máscara</th><th>Bloco</th><th>Hosts válidos</th></tr>
+        <tr><td>/24</td><td>255.255.255.0</td><td>256</td><td>254</td></tr>
+        <tr><td>/25</td><td>255.255.255.128</td><td>128</td><td>126</td></tr>
+        <tr><td>/26</td><td>255.255.255.192</td><td>64</td><td>62</td></tr>
+        <tr><td>/27</td><td>255.255.255.224</td><td>32</td><td>30</td></tr>
+        <tr><td>/28</td><td>255.255.255.240</td><td>16</td><td>14</td></tr>
+        <tr><td>/29</td><td>255.255.255.248</td><td>8</td><td>6</td></tr>
+        <tr><td>/30</td><td>255.255.255.252</td><td>4</td><td>2</td></tr>
+      </table></div>
+
+      <h3>Faixas privadas e endereços especiais</h3>
+      <ul>
+        <li><code>10.0.0.0/8</code>, de 10.0.0.0 a 10.255.255.255. Faixa privada grande, comum em empresas.</li>
+        <li><code>172.16.0.0/12</code>, de 172.16.0.0 a 172.31.255.255. Faixa privada média.</li>
+        <li><code>192.168.0.0/16</code>, de 192.168.0.0 a 192.168.255.255. Faixa privada típica de casa e escritório.</li>
+        <li><code>127.0.0.1</code>, o loopback. É a própria máquina, não passa pela rede.</li>
+        <li><code>169.254.x.x</code>, o APIPA. Se aparecer, o host não recebeu resposta do DHCP e se atribuiu um endereço sozinho. É um sintoma, não uma configuração.</li>
+      </ul>
+    </article>
+
+    <article class="card">
+      <h2 id="c5">5. Gateway</h2>
+      <p>Gateway é a porta de saída da rede. Na prática, é o endereço IP de uma interface do roteador dentro daquela rede local. Quando o host precisa falar com alguém que não está na sua rede, ele entrega o pacote ao gateway, e o roteador continua o trabalho dali para a frente.</p>
+
+      <h3>Como o host decide usar o gateway</h3>
+      <p>Antes de enviar qualquer pacote, o host faz uma comparação. Ele aplica a própria máscara ao endereço de destino e compara o resultado com a própria rede.</p>
+      <div class="pre">Host   192.168.1.10 / 255.255.255.0     rede 192.168.1.0
+
+Destino 192.168.1.50   AND máscara  =  192.168.1.0   igual     -> entrega direta
+Destino 192.168.2.10   AND máscara  =  192.168.2.0   diferente -> manda ao gateway</div>
+      <p>Na entrega direta o host resolve o MAC do próprio destino por ARP e envia o quadro pelo switch. Na entrega indireta ele resolve o MAC do gateway e envia o quadro para o roteador, mantendo o IP do destino final dentro do pacote.</p>
+
+      <h3>A rota padrão</h3>
+      <p>Na tabela de rotas do host, o gateway aparece como rota padrão, escrita como <code>0.0.0.0/0</code>. Ela significa qualquer destino que não casou com nenhuma rota mais específica. É sempre a última opção consultada, porque o roteamento escolhe sempre a rota de prefixo mais longo.</p>
+
+      <h3>Vários gateways na mesma rede</h3>
+      <p>Uma rede pode ter mais de um roteador. Três situações aparecem com frequência:</p>
+      <ul>
+        <li><span class="k">Saídas diferentes para destinos diferentes:</span> um roteador leva à internet e outro leva a uma filial. O host mantém o gateway padrão apontando para a internet e recebe uma rota estática dizendo que a rede da filial vai pelo outro roteador.</li>
+        <li><span class="k">Redundância:</span> dois roteadores compartilham um mesmo IP virtual de gateway usando protocolos como VRRP ou HSRP. Os hosts conhecem apenas esse IP virtual; se o roteador ativo cair, o outro assume sem que ninguém precise ser reconfigurado.</li>
+        <li><span class="k">Dois gateways padrão no mesmo host:</span> é a configuração que dá problema. O sistema escolhe pela métrica da interface, e o comportamento fica imprevisível, com tráfego saindo pelo caminho errado ou intermitência. Evite: use um gateway padrão e rotas estáticas para o resto.</li>
+      </ul>
+      <div class="note">Regra que resolve a maioria dos exercícios: o gateway precisa estar dentro da mesma sub-rede do host. Um host 192.168.1.10/24 não pode ter gateway 192.168.2.1, porque ele não consegue nem resolver o MAC desse endereço.</div>
+    </article>
+
+    <article class="card">
+      <h2 id="c6">6. ARP: por que ele é necessário</h2>
+      <p>Existem dois endereços em jogo o tempo todo. O endereço IP, da camada 3, é lógico, configurado, e identifica o host na rede. O endereço MAC, da camada 2, é físico, de fábrica, e identifica a placa dentro do segmento local.</p>
+      <p>A aplicação trabalha com IP: o navegador quer falar com 192.168.1.50. Mas quem entrega de fato é a camada 2, e o quadro Ethernet exige um endereço MAC de destino para ser montado. Falta alguém que ligue uma coisa na outra. Esse alguém é o ARP, o Address Resolution Protocol.</p>
+
+      <h3>Como funciona</h3>
+      <ol>
+        <li>O host quer enviar algo para 192.168.1.50 e consulta a própria tabela ARP.</li>
+        <li>Se encontra o par, monta o quadro e envia. Fim.</li>
+        <li>Se não encontra, envia um ARP Request em broadcast, para <code>FF:FF:FF:FF:FF:FF</code>, perguntando quem tem o endereço 192.168.1.50.</li>
+        <li>Todos os dispositivos do segmento recebem a pergunta, mas só o dono daquele IP responde.</li>
+        <li>A resposta, o ARP Reply, vem em unicast e traz o MAC.</li>
+        <li>O par IP e MAC entra na tabela ARP e passa a valer por alguns minutos.</li>
+      </ol>
+
+      <h3>O detalhe que mais cai em prova</h3>
+      <p>Quando o destino está em outra rede, o host não faz ARP do IP remoto. O ARP usa broadcast, e broadcast não atravessa roteador. O que o host faz é resolver o MAC do gateway.</p>
+      <div class="pre">PC1 (192.168.1.10, em R1) quer falar com PC2 (192.168.2.10, em R2)
+
+Camada 3  origem 192.168.1.10   destino 192.168.2.10    nao muda no caminho
+Camada 2  origem MAC do PC1     destino MAC do ROTEADOR  muda a cada salto
+
+Na tabela ARP do PC1 entra o par do gateway, nunca o do PC2.</div>
+
+      <h3>Onde ela fica e como consultar</h3>
+      <p>Cada dispositivo tem a sua própria tabela ARP, guardada na memória do sistema operacional. O roteador também tem, uma por interface. As entradas expiram em minutos, o que faz a rede se recuperar sozinha quando uma placa de rede é trocada.</p>
+      <div class="pre">Windows   arp -a          lista o cache
+          arp -d *        limpa o cache (como administrador)
+Linux     ip neigh        lista o cache
+          ip neigh flush all</div>
+      <div class="note">Uma entrada marcada como incomplete significa que a pergunta foi feita e ninguém respondeu. Isso aponta problema na camada 2 ou host desligado, e não erro de rota.</div>
+    </article>
+
+    <article class="card">
+      <h2 id="c7">7. DHCP: como funciona</h2>
+      <p>O DHCP, Dynamic Host Configuration Protocol, entrega automaticamente a configuração de rede para os hosts. Sem ele, cada máquina precisaria de IP, máscara, gateway e DNS digitados à mão, com risco de erro e de endereço repetido.</p>
+
+      <h3>As quatro mensagens</h3>
+      <p>O processo tem quatro etapas, lembradas pela sigla DORA. Repare que as primeiras acontecem em broadcast, porque o cliente ainda não tem endereço nenhum.</p>
+      <div class="scroller"><table class="tbl">
+        <tr><th>Etapa</th><th>Quem envia</th><th>Tipo</th><th>O que diz</th></tr>
+        <tr><td>1. Discover</td><td>Cliente</td><td>Broadcast</td><td>Existe algum servidor DHCP nesta rede?</td></tr>
+        <tr><td>2. Offer</td><td>Servidor</td><td>Broadcast</td><td>Tenho este IP disponível, com máscara, gateway e DNS</td></tr>
+        <tr><td>3. Request</td><td>Cliente</td><td>Broadcast</td><td>Aceito essa oferta e nenhuma outra</td></tr>
+        <tr><td>4. Ack</td><td>Servidor</td><td>Unicast</td><td>Confirmado, o endereço é seu pelo tempo do lease</td></tr>
+      </table></div>
+      <p>O Request vai em broadcast de propósito: se houver mais de um servidor DHCP na rede, os outros ficam sabendo que a oferta deles foi recusada e liberam o endereço que tinham reservado.</p>
+
+      <h3>Portas e endereços</h3>
+      <div class="pre">Cliente  porta 68   ->  Servidor  porta 67
+
+No Discover o cliente usa origem 0.0.0.0 e destino 255.255.255.255,
+porque ainda não tem endereço nem sabe quem é o servidor.</div>
+
+      <h3>Lease, renovação e reserva</h3>
+      <ul>
+        <li><span class="k">Lease</span> é o tempo de empréstimo do endereço, comum entre 8 e 24 horas. Terminado o prazo sem renovação, o IP volta para o pool.</li>
+        <li><span class="k">Renovação:</span> na metade do lease, o momento chamado T1, o cliente tenta renovar direto com o servidor, em unicast. Se não conseguir, tenta de novo em 87,5 por cento do tempo, o T2, agora em broadcast, aceitando qualquer servidor.</li>
+        <li><span class="k">Pool,</span> ou escopo, é a faixa que o servidor pode distribuir, por exemplo de 192.168.0.100 a 192.168.0.200.</li>
+        <li><span class="k">Reserva</span> amarra um IP fixo a um MAC específico. A impressora sempre recebe o mesmo endereço sem precisar de configuração manual nela.</li>
+        <li><span class="k">Relay:</span> como o Discover é broadcast e broadcast não passa pelo roteador, uma rede sem servidor DHCP próprio precisa de um agente relay no roteador, que encaminha o pedido ao servidor de outra rede.</li>
+      </ul>
+
+      <h3>Quando o DHCP falha</h3>
+      <p>Se nenhum servidor responder, o sistema se atribui um endereço <code>169.254.x.x</code>, o APIPA. Com ele a máquina fala apenas com outras que também estejam em APIPA, e não tem gateway. Ver um endereço 169.254 no <code>ipconfig</code> é diagnóstico direto: o DHCP não respondeu.</p>
+    </article>
+
+    <article class="card">
+      <h2 id="c8">8. Tabela MAC e tabela ARP lado a lado</h2>
+      <p>As duas tabelas são confundidas o tempo todo porque as duas guardam endereços MAC. A diferença está em o que cada uma associa e em quem é o dono dela.</p>
+      <div class="scroller"><table class="tbl">
+        <tr><th></th><th>Tabela MAC</th><th>Tabela ARP</th></tr>
+        <tr><td>Associa</td><td>Endereço MAC a porta física</td><td>Endereço IP a endereço MAC</td></tr>
+        <tr><td>Onde fica</td><td>Na memória do switch</td><td>Na memória de cada host e do roteador</td></tr>
+        <tr><td>Camada</td><td>2</td><td>Entre a 3 e a 2</td></tr>
+        <tr><td>Como é preenchida</td><td>O switch lê o MAC de origem dos quadros que recebe</td><td>O host pergunta em broadcast quem tem aquele IP</td></tr>
+        <tr><td>Para que serve</td><td>Encaminhar o quadro só pela porta certa</td><td>Descobrir qual MAC colocar no quadro</td></tr>
+        <tr><td>Se não existisse</td><td>O switch inundaria todas as portas, como um hub</td><td>O host não conseguiria montar o quadro</td></tr>
+        <tr><td>Como consultar</td><td>show mac address-table</td><td>arp -a ou ip neigh</td></tr>
+      </table></div>
+      <div class="note">Frase para memorizar: a tabela MAC responde por onde eu mando. A tabela ARP responde para quem eu mando.</div>
+    </article>
+
+    <article class="card">
+      <h2 id="c9">9. Duas redes locais ligadas por um roteador</h2>
+      <p>Cenário: duas redes isoladas, R1 com a faixa <code>192.168.1.0/24</code> e R2 com a faixa <code>192.168.2.0/24</code>. O objetivo é fazer um computador de R1 conversar com um de R2.</p>
+
+      <h3>Qual equipamento é necessário</h3>
+      <p>Um roteador, ou um switch de camada 3. Switch comum não resolve, porque ele só encaminha dentro do mesmo domínio de broadcast e não toma decisões com base em IP. Como as duas redes têm endereçamento diferente, é obrigatória uma decisão de camada 3.</p>
+
+      <h3>O que configurar no roteador</h3>
+      <ul>
+        <li>Uma interface conectada em cada rede, cada uma com um IP dentro da respectiva sub-rede: eth0 com 192.168.1.1/24 em R1 e eth1 com 192.168.2.1/24 em R2. Esses dois endereços serão os gateways dos hosts.</li>
+        <li>Roteamento habilitado. As duas sub-redes entram na tabela de rotas como redes diretamente conectadas, o que já basta para o tráfego entre elas. Rotas estáticas ou um protocolo dinâmico só seriam necessários se houvesse outros roteadores no caminho.</li>
+        <li>Firewall liberando o tráfego entre as duas interfaces.</li>
+        <li>Sem NAT entre R1 e R2. NAT serve para a saída à internet, não para redes internas que precisam se enxergar.</li>
+      </ul>
+
+      <h3>O que configurar no computador de R1</h3>
+      <ul>
+        <li>IP dentro da faixa de R1 e único, por exemplo 192.168.1.10.</li>
+        <li>Máscara 255.255.255.0, a mesma de todos os hosts de R1.</li>
+        <li>Gateway padrão 192.168.1.1, que é o IP do roteador dentro de R1. Este é o ponto que mais falha: sem gateway o host só alcança a própria rede.</li>
+        <li>Servidor DNS, se for acessar por nome.</li>
+      </ul>
+
+      <h3>O caminho completo de um pacote, passo a passo</h3>
+      <p>Este roteiro amarra tudo o que foi visto até aqui. O PC1, 192.168.1.10, quer falar com o PC2, 192.168.2.10.</p>
+      <ol>
+        <li><span class="k">Decisão.</span> O PC1 aplica a própria máscara ao IP de destino. O resultado, 192.168.2.0, é diferente da sua rede, 192.168.1.0. Logo o destino não é local.</li>
+        <li><span class="k">Escolha do gateway.</span> Como o destino é remoto, o pacote vai para o gateway padrão, 192.168.1.1.</li>
+        <li><span class="k">ARP.</span> O PC1 precisa do MAC do gateway. Consulta o cache; se não tiver, pergunta em broadcast e o roteador responde.</li>
+        <li><span class="k">Montagem do quadro.</span> No nível 3, origem 192.168.1.10 e destino 192.168.2.10. No nível 2, origem MAC do PC1 e destino MAC do roteador.</li>
+        <li><span class="k">Switch SW1.</span> Lê o MAC de destino, encontra na tabela MAC a porta do roteador e envia o quadro só por ela. O switch nem olha o IP.</li>
+        <li><span class="k">Roteador.</span> Descarta o cabeçalho de camada 2, lê o IP de destino, consulta a tabela de rotas e vê que 192.168.2.0/24 está diretamente conectada na outra interface. Faz ARP do 192.168.2.10 dentro de R2, monta um quadro novo com a sua própria interface como origem, decrementa o TTL em 1 e encaminha.</li>
+        <li><span class="k">Switch SW2 e PC2.</span> O SW2 entrega pela porta do PC2. A resposta faz o caminho inverso, e por isso o PC2 também precisa de gateway configurado, senão o pacote vai e não volta.</li>
+      </ol>
+      <div class="note">Resumo em uma frase: o par de endereços IP não muda de ponta a ponta; o par de endereços MAC é reescrito a cada salto. MAC é local, IP é fim a fim.</div>
+
+      <h3>Como verificar a conectividade</h3>
+      <p>Teste sempre do mais perto para o mais longe. Assim o primeiro comando que falhar aponta onde está o problema.</p>
+      <div class="pre">1.  ipconfig /all           confere IP, máscara e gateway
+2.  ping 192.168.1.10       a própria interface responde
+3.  ping 192.168.1.1        chego no meu gateway
+4.  ping 192.168.2.1        o roteador enxerga a outra rede
+5.  ping 192.168.2.10       teste fim a fim
+6.  tracert 192.168.2.10    mostra em que salto o caminho morre
+7.  arp -a                  o MAC do gateway foi resolvido?
+8.  route print             existe rota padrão?</div>
+      <div class="note">O ping usa ICMP, e muitos firewalls bloqueiam esse protocolo. Ping sem resposta não prova que não há conectividade. Confirme testando a porta da aplicação, por exemplo com <code>Test-NetConnection 192.168.2.10 -Port 8080</code> no PowerShell.</div>
+
+      <h3>Requisitos de endereçamento</h3>
+      <p><span class="k">Dentro de R1.</span> Todos os hosts precisam estar na mesma sub-rede e usar a mesma máscara: aplicando a máscara ao IP de cada um, o endereço de rede resultante tem que ser igual para todos. Além disso, nenhum IP pode se repetir, os endereços precisam estar na faixa válida de hosts, que em 192.168.1.0/24 vai de .1 a .254, e o endereço de rede 192.168.1.0 e o de broadcast 192.168.1.255 não podem ser atribuídos.</p>
+      <p><span class="k">Entre R1 e R2.</span> As duas precisam ser sub-redes distintas e sem sobreposição de faixas. As faixas 192.168.1.0/24 e 192.168.2.0/24 funcionam. Já 192.168.1.0/24 e 192.168.1.128/25 se sobrepõem, porque a segunda está dentro da primeira, e isso quebra o roteamento: o host conclui que o destino é local, tenta resolver por ARP e nunca entrega o pacote ao roteador. Nenhum IP pode se repetir entre as duas redes, cada host usa o gateway da sua própria rede, e o roteador precisa conhecer uma rota para ambas.</p>
+    </article>
+
+    <article class="card">
+      <h2 id="c10">10. A topologia montada</h2>
+      <p>Duas redes locais, ambas com acesso sem fio, dois nós em cada uma, ligadas por um roteador. Ao lado de cada equipamento está a configuração essencial para a rede funcionar.</p>
       <div class="topo">
         <div class="lan">
           <p class="lanhead">Rede R1 — 192.168.1.0/24 · gateway 192.168.1.1</p>
@@ -247,7 +595,7 @@
             <div class="node"><p class="nn">Note1, Wi-Fi</p><p class="nc">192.168.1.20/24<br>GW 192.168.1.1<br>MAC 00:1A:2B:00:00:12</p></div>
           </div>
         </div>
-        <div class="router">Roteador<br>eth0 192.168.1.1/24 · MAC 00:1A:2B:00:00:01<br>eth1 192.168.2.1/24 · MAC 00:1A:2B:00:00:02</div>
+        <div class="router">Roteador<br>eth0 192.168.1.1/24 · MAC 00:1A:2B:00:00:01<br>eth1 192.168.2.1/24 · MAC 00:1A:2B:00:00:02<br>roteamento habilitado</div>
         <div class="lan">
           <p class="lanhead">Rede R2 — 192.168.2.0/24 · gateway 192.168.2.1</p>
           <div class="nodes">
@@ -258,20 +606,57 @@
           </div>
         </div>
       </div>
-      <h3>Tabela MAC, que fica no switch SW1</h3>
+
+      <h3>Tabela MAC do switch SW1</h3>
+      <p>Aprendida sozinha, a partir do MAC de origem dos quadros recebidos.</p>
       <div class="scroller"><table class="tbl">
         <tr><th>Porta</th><th>Endereço MAC</th><th>Dispositivo</th></tr>
         <tr><td>Fa0/1</td><td>00:1A:2B:00:00:11</td><td>PC1</td></tr>
-        <tr><td>Fa0/2</td><td>00:1A:2B:00:00:12</td><td>Note1, pelo AP1</td></tr>
+        <tr><td>Fa0/2</td><td>00:1A:2B:00:00:12</td><td>Note1, através do AP1</td></tr>
         <tr><td>Fa0/24</td><td>00:1A:2B:00:00:01</td><td>Roteador</td></tr>
       </table></div>
-      <h3>Tabela ARP, que fica no PC1</h3>
+
+      <h3>Tabela ARP do PC1</h3>
+      <p>Cada dispositivo tem a sua. O SW2, o roteador e os demais hosts mantêm tabelas próprias.</p>
       <div class="scroller"><table class="tbl">
         <tr><th>Endereço IP</th><th>Endereço MAC</th><th>Dispositivo</th></tr>
-        <tr><td>192.168.1.1</td><td>00:1A:2B:00:00:01</td><td>Roteador, gateway</td></tr>
+        <tr><td>192.168.1.1</td><td>00:1A:2B:00:00:01</td><td>Roteador, o gateway</td></tr>
         <tr><td>192.168.1.20</td><td>00:1A:2B:00:00:12</td><td>Note1</td></tr>
       </table></div>
-      <p>Para falar com o PC2, em <code>192.168.2.10</code>, o PC1 não cria entrada ARP para esse IP. Ele usa o MAC do gateway, porque o ARP não atravessa o roteador.</p>
+      <p>Para falar com o PC2, em 192.168.2.10, o PC1 não cria entrada ARP para esse IP. Ele usa o MAC do gateway, porque o ARP não atravessa o roteador.</p>
+      <div class="note">Os endereços MAC do exemplo são fictícios. O MAC não é uma configuração: ele vem de fábrica na placa. Aparece aqui porque as tabelas MAC e ARP são feitas dele.</div>
+    </article>
+
+    <article class="card">
+      <h2 id="c11">11. Comandos de diagnóstico</h2>
+      <div class="scroller"><table class="tbl">
+        <tr><th>Objetivo</th><th>Windows</th><th>Linux</th></tr>
+        <tr><td>Ver IP, máscara e gateway</td><td>ipconfig /all</td><td>ip addr e ip route</td></tr>
+        <tr><td>Testar alcance de um host</td><td>ping destino</td><td>ping destino</td></tr>
+        <tr><td>Ver o caminho até o destino</td><td>tracert destino</td><td>traceroute destino</td></tr>
+        <tr><td>Ver o cache ARP</td><td>arp -a</td><td>ip neigh</td></tr>
+        <tr><td>Limpar o cache ARP</td><td>arp -d *</td><td>ip neigh flush all</td></tr>
+        <tr><td>Ver a tabela de rotas</td><td>route print</td><td>ip route</td></tr>
+        <tr><td>Renovar o IP do DHCP</td><td>ipconfig /release e /renew</td><td>dhclient -r e dhclient</td></tr>
+        <tr><td>Testar uma porta</td><td>Test-NetConnection host -Port n</td><td>nc -zv host n</td></tr>
+        <tr><td>Limpar o cache de DNS</td><td>ipconfig /flushdns</td><td>resolvectl flush-caches</td></tr>
+      </table></div>
+    </article>
+
+    <article class="card">
+      <h2 id="c12">12. Erros que mais derrubam uma rede</h2>
+      <ul>
+        <li><span class="k">Máscara diferente entre hosts da mesma rede.</span> A fala com B, mas B não responde a A, porque cada um calcula um limite de rede diferente.</li>
+        <li><span class="k">IP duplicado.</span> A conexão fica intermitente e o sistema costuma avisar com a mensagem de conflito de endereço IP.</li>
+        <li><span class="k">Gateway fora da sub-rede do host.</span> O host não consegue nem resolver o MAC do gateway, porque ele não está no mesmo segmento.</li>
+        <li><span class="k">Usar o endereço de rede ou de broadcast em um host.</span> Em uma /24, o .0 e o .255 são reservados.</li>
+        <li><span class="k">Achar que switch separa redes.</span> Switch é camada 2 e não separa domínio de broadcast, a menos que use VLAN. Quem separa é o roteador.</li>
+        <li><span class="k">Achar que o access point cria uma rede nova.</span> O AP é ponte de camada 2. Wi-Fi e cabo compartilham IP, máscara e gateway.</li>
+        <li><span class="k">Concluir que a rede caiu porque o ping falhou.</span> O ICMP costuma ser bloqueado por firewall. Teste a porta da aplicação.</li>
+        <li><span class="k">Sub-redes sobrepostas entre duas redes.</span> O host acha que o destino é local e nunca entrega o pacote ao roteador.</li>
+        <li><span class="k">Endereço 169.254.x.x.</span> Não é configuração: é sinal de que o DHCP não respondeu.</li>
+        <li><span class="k">Cache ARP velho depois de trocar uma placa de rede.</span> Espere expirar ou limpe com <code>arp -d</code>.</li>
+      </ul>
     </article>
 
   </section>
